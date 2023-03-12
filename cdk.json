@@ -2,8 +2,9 @@
   "app": "python3 app.py",
   "context": {
     "project_name": "emr-stream-demo",
-    "emr_version":"emr-6.6.0",
+    "emr_version":"emr-6.9.0",
     "version": "v2.0.0",
-    "@aws-cdk/core:stackRelativeExports": "false"
+    "@aws-cdk/core:stackRelativeExports": "false",
+    "profile": "do-not-exist"
   }
 }

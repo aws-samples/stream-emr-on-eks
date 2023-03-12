@@ -96,7 +96,7 @@ class SparkOnEksConst(Construct):
                 }
             }
         )
-        # _emr_02_name = "emrserverless"
+        # _emr_02_name = "emrs-workshop"
         # emr_serverless_ns = eks_cluster.add_manifest('EMRFargateNamespace',{
         #         "apiVersion": "v1",
         #         "kind": "Namespace",
