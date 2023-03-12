@@ -50,7 +50,7 @@ class MSKStack(NestedStack):
    
         self._msk_cluster = msk.Cluster(self, "EMR-EKS-stream",
             cluster_name=cluster_name,
-            kafka_version=msk.KafkaVersion.V2_6_2,
+            kafka_version=msk.KafkaVersion.V2_8_1,
             vpc=eksvpc,
             ebs_storage_info=msk.EbsStorageInfo(volume_size=500),
             encryption_in_transit=msk.EncryptionInTransitConfig(

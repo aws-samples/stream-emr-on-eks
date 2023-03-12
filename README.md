@@ -19,7 +19,7 @@ The infrastructure deployment includes the following:
     - 1 primary and 1 core nodes with r5.xlarge.
     - configured to run one Spark job at a time.
     - can scale from 1 to 10 core + task nodes
-    - mounted EFS for checkpointing test/demo (a bootstrap action)
+    - mounted EFS for checkpointing test/demo (a bootstrap action) 
 
 ## Spark examples - read stream from MSK
 Spark consumer applications reading from Amazon MSK:

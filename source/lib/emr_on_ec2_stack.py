@@ -36,7 +36,7 @@ class EMREC2Stack(NestedStack):
             lifecycle_policy=efs.LifecyclePolicy.AFTER_60_DAYS,
             performance_mode=efs.PerformanceMode.MAX_IO,
             removal_policy=RemovalPolicy.DESTROY,
-            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT, one_per_az=True)
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS, one_per_az=True)
         )
 
         ###########################

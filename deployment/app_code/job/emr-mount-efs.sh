@@ -37,11 +37,11 @@ done
 sudo mkdir -p /efs
  
 # mount efs
-sudo mount -t nfs4 \
+ until sudo mount -t nfs4 \
            -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 \
            $fs_id.efs.$region_id.amazonaws.com:/ \
-           /efs
- 
+           /efs; do echo "Shared filesystem no ready yet..." ; sleep 5; done
+
 cd /efs
  
 # give hadoop user permission to efs directory
