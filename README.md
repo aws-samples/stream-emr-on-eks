@@ -110,7 +110,7 @@ rm -vf ${HOME}/.aws/credentials
 
 4. Run the script to configure the cloud9 IDE environment:
 ```bash
-curl https://raw.githubusercontent.com/melodyyangaws/emr-stream-demo/master/deployment/app_code/post-deployment.sh | bash
+curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/main/deployment/app_code/post-deployment.sh | bash
 ```
 5. Wait for 5 mins, then check the [MSK cluster](https://console.aws.amazon.com/msk/) status. Make sure it is `active` before sending data to the cluster.
 6. Launching a new termnial window in Cloud9, send the sample data to MSK:
@@ -254,7 +254,7 @@ docker push $ECR_URL/emr6.5_custom_boto3
 ### 2. Use kinesis-sql connector
 This demo uses the `com.qubole.spark/spark-sql-kinesis_2.12/1.2.0-spark_3.0` connector to interact with Kinesis. 
 
-To enable the job-level access control, ie. the [IRSA feature](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html), we have forked the [kinesis-sql git repo](https://github.com/melodyyangaws/kinesis-sql) and recompiled a new jar after upgraded the AWS java SDK. The custom docker build above will pick up the upgraded connector automatically.
+To enable the job-level access control, ie. the [IRSA feature](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html), we have forked the [kinesis-sql git repo](https://github.com/aws-samples/kinesis-sql) and recompiled a new jar after upgraded the AWS java SDK. The custom docker build above will pick up the upgraded connector automatically.
 
 - [Sample job](deployment/app_code/job/qubole-kinesis.py) to consume data stream in Kinesis
 - Submit the job:
@@ -335,6 +335,6 @@ aws emr-containers start-job-run \
 ## Clean up
 Run the clean-up script with:
 ```bash
-curl https://raw.githubusercontent.com/melodyyangaws/emr-stream-demo/master/deployment/app_code/delete_all.sh | bash
+curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/main/deployment/app_code/delete_all.sh | bash
 ```
 Go to the [CloudFormation console](https://console.aws.amazon.com/cloudformation/home?region=us-east-1), manually delete the remaining resources if needed.
