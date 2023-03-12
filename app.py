@@ -11,15 +11,15 @@ proj_name = app.node.try_get_context('project_name')
 emr_release_v=app.node.try_get_context('emr_version')
 
 # main stacks
-eks_stack = SparkOnEksStack(app, 'StreamOnEKS', proj_name)
+eks_stack = SparkOnEksStack(app, proj_name, proj_name)
 msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
 
 # OPTIONAL: nested stack to setup EMR on EC2
-emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket)
+# emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket)
 
 Tags.of(eks_stack).add('project', proj_name)
 Tags.of(msk_stack).add('project', proj_name)
-Tags.of(emr_ec2_stack).add('for-use-with-amazon-emr-managed-policies', 'true')
+# Tags.of(emr_ec2_stack).add('for-use-with-amazon-emr-managed-policies', 'true')
 
 # Deployment Output
 CfnOutput(eks_stack,'CODE_BUCKET', value=eks_stack.code_bucket)
@@ -29,7 +29,7 @@ CfnOutput(eks_stack,"MSK_CLIENT_URL",
 )
 CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
-# CfnOutput(eks_stack, "FargateVirtualClusterId",value=eks_stack.EMRFargateVC)
+CfnOutput(eks_stack, "FargateVirtualClusterId",value=eks_stack.EMRFargateVC)
 CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)
 
 app.synth()

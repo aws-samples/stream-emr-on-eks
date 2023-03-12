@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export stack_name="${1:-StreamOnEKS}"
+export stack_name="${1:-emrroadshow}"
 
 # 0. Setup AWS environment
 echo "Setup AWS environment ..."
@@ -16,13 +16,13 @@ aws configure get default.region
 export S3BUCKET=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='CODEBUCKET'].OutputValue" --output text)
 export MSK_SERVER=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='MSKBROKER'].OutputValue" --output text)
 export VIRTUAL_CLUSTER_ID=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='VirtualClusterId'].OutputValue" --output text)
-# export SERVERLESS_VIRTUAL_CLUSTER_ID=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='FargateVirtualClusterId'].OutputValue" --output text)
+export SERVERLESS_VIRTUAL_CLUSTER_ID=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='FargateVirtualClusterId'].OutputValue" --output text)
 export EMR_ROLE_ARN=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='EMRExecRoleARN'].OutputValue" --output text)
 
 echo "export S3BUCKET=${S3BUCKET}" | tee -a ~/.bash_profile
 echo "export MSK_SERVER=${MSK_SERVER}" | tee -a ~/.bash_profile
 echo "export VIRTUAL_CLUSTER_ID=${VIRTUAL_CLUSTER_ID}" | tee -a ~/.bash_profile
-# echo "export SERVERLESS_VIRTUAL_CLUSTER_ID=${SERVERLESS_VIRTUAL_CLUSTER_ID}" | tee -a ~/.bash_profile
+echo "export SERVERLESS_VIRTUAL_CLUSTER_ID=${SERVERLESS_VIRTUAL_CLUSTER_ID}" | tee -a ~/.bash_profile
 echo "export EMR_ROLE_ARN=${EMR_ROLE_ARN}" | tee -a ~/.bash_profile
 
 # 1. install k8s command tools
@@ -44,7 +44,7 @@ if [ -z "$validate" ]; then
     echo "Update MSK configuration ..."
 
     configArn=$(aws kafka create-configuration --name "autotopic" --description "Topic autocreation enabled; Log retention 24h; Apache ZooKeeper timeout 1000 ms; Log rolling 16h." --server-properties file://msk-config.txt | jq -r '.Arn')
-    msk_cluster=$(aws kafka list-clusters --region $AWS_REGION --query 'ClusterInfoList[?ClusterName==`emr-stream-demo`].ClusterArn' --output text)
+    msk_cluster=$(aws kafka list-clusters --region $AWS_REGION --query 'ClusterInfoList[?ClusterName==`$stack_name`].ClusterArn' --output text)
     msk_version=$(aws kafka describe-cluster --cluster-arn ${msk_cluster} --query "ClusterInfo.CurrentVersion" --output text)
     aws kafka update-cluster-configuration --cluster-arn ${msk_cluster} --configuration-info '{"Arn": "'$configArn'","Revision": 1 }' --current-version ${msk_version}
 fi

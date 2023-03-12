@@ -1,7 +1,7 @@
 {
   "app": "python3 app.py",
   "context": {
-    "project_name": "emr-stream-demo",
+    "project_name": "emr-roadshow",
     "emr_version":"emr-6.9.0",
     "version": "v2.0.0",
     "@aws-cdk/core:stackRelativeExports": "false"

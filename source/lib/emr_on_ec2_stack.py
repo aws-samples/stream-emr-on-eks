@@ -96,7 +96,7 @@ class EMREC2Stack(NestedStack):
             visible_to_all_users=True,
             service_role=svc_role.role_name,
             job_flow_role=emr_job_role.role_name,
-            tags=[CfnTag(key="project", value="emr-stream-demo")],
+            tags=[CfnTag(key="project", value=cluster_name)],
             instances=CfnCluster.JobFlowInstancesConfigProperty(
                 termination_protected=False,
                 master_instance_group=CfnCluster.InstanceGroupConfigProperty(

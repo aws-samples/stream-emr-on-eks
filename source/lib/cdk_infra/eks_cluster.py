@@ -22,7 +22,7 @@ class EksConst(Construct):
         noderole: IRole, 
         eks_adminrole: IRole, 
         emr_svc_role: IRole, 
-        # fg_pod_role: IRole, 
+        fg_pod_role: IRole, 
         **kwargs
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -67,14 +67,14 @@ class EksConst(Construct):
             tags = {'Name':'Spot-'+eksname, 'k8s.io/cluster-autoscaler/enabled': 'true', 'k8s.io/cluster-autoscaler/'+eksname: 'owned'}
         )
 
-        # # 4. Add Fargate NodeGroup to EKS, without setup cluster-autoscaler
-        # self._my_cluster.add_fargate_profile('FargateEnabled',
-        #     selectors =[{
-        #         "namespace": "emr",
-        #         "labels": {"type":"serverless"}
-        #     }],
-        #     pod_execution_role=fg_pod_role
-        # )
+        # 4. Add Fargate NodeGroup to EKS, without setup cluster-autoscaler
+        self._my_cluster.add_fargate_profile('FargateEnabled',
+            selectors =[{
+                "namespace": "emr",
+                "labels": {"type":"serverless"}
+            }],
+            pod_execution_role=fg_pod_role
+        )
         
         # 5. Map EMR user to IAM role
         self._my_cluster.aws_auth.add_role_mapping(emr_svc_role, groups=[], username="emr-containers")

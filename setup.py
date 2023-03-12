@@ -9,7 +9,7 @@ except IOError as e:
     long_description = ''
 
 setuptools.setup(
-    name="emr-stream-demo",
+    name="emr-roadshow",
     version="2.0.0",
 
     description="A CDK Python app for Spark Structured Streaming ETL",
