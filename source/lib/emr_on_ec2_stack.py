@@ -153,4 +153,4 @@ class EMREC2Stack(NestedStack):
                 )
             )]
         )
-        emr_c.add_depends_on(emr_job_flow_profile)
+        emr_c.add_dependency(emr_job_flow_profile)

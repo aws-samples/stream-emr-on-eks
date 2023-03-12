@@ -30,7 +30,7 @@ CfnOutput(eks_stack,"MSK_CLIENT_URL",
 )
 CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
-# CfnOutput(eks_stack, "FargateVirtualClusterId",value=eks_stack.EMRFargateVC)
+CfnOutput(eks_stack, "FargateVirtualClusterId",value=eks_stack.EMRFargateVC)
 CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)
 
 app.synth()

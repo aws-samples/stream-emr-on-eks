@@ -35,19 +35,8 @@ class MSKStack(NestedStack):
             automatic_stop_time_minutes=60
         )
         self._c9env.apply_removal_policy(RemovalPolicy.DESTROY)
-
-        # MSK Cluster Security Group
-        sg_msk = ec2.SecurityGroup(self, "msk_sg",
-            vpc=eksvpc, allow_all_outbound=True, security_group_name="msk_sg"
-        )    
-        for subnet in eksvpc.public_subnets:
-            sg_msk.add_ingress_rule(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(2181), "Zookeeper Plaintext")
-            sg_msk.add_ingress_rule(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(2182), "Zookeeper TLS")
-            sg_msk.add_ingress_rule(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(9092), "Broker Plaintext")
-            sg_msk.add_ingress_rule(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(9094), "Zookeeper Plaintext")
-        for subnet in eksvpc.private_subnets:
-            sg_msk.add_ingress_rule(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.all_traffic(), "All private traffic")
-   
+        
+        # create MSK Cluster
         self._msk_cluster = msk.Cluster(self, "EMR-EKS-stream",
             cluster_name=cluster_name,
             kafka_version=msk.KafkaVersion.V2_8_1,
@@ -59,6 +48,14 @@ class MSKStack(NestedStack):
             ),
             instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
             removal_policy=RemovalPolicy.DESTROY,
-            security_groups=[sg_msk],
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC,one_per_az=True)
         )
+
+        for subnet in eksvpc.public_subnets:
+            self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(2181), "Zookeeper Plaintext")
+            self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(2182), "Zookeeper TLS")
+            self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(9092), "Broker Plaintext")
+            self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(9094), "Zookeeper Plaintext")
+        for subnet in eksvpc.private_subnets:
+            self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.all_traffic(), "All private traffic")
+   
