@@ -17,7 +17,6 @@ msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
 # OPTIONAL: nested stack to setup EMR on EC2
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket)
 
-
 Tags.of(eks_stack).add('project', proj_name)
 Tags.of(msk_stack).add('project', proj_name)
 Tags.of(emr_ec2_stack).add('for-use-with-amazon-emr-managed-policies', 'true')

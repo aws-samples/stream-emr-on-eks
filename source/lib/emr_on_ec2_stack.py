@@ -50,7 +50,8 @@ class EMREC2Stack(NestedStack):
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonElasticMapReduceforEC2Role"),
                 iam.ManagedPolicy.from_aws_managed_policy_name("AmazonMSKFullAccess"),
-                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticFileSystemReadOnlyAccess")
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticFileSystemReadOnlyAccess"),
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSSMManagedInstanceCore")
             ]
         )
         _iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-iam-role.yaml', 
@@ -153,4 +154,4 @@ class EMREC2Stack(NestedStack):
                 )
             )]
         )
-        emr_c.add_depends_on(emr_job_flow_profile)
+        emr_c.add_dependency(emr_job_flow_profile)

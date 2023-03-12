@@ -43,6 +43,6 @@ class NetworkSgConst(Construct):
                                         subnets=[ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
                                                  ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)])
                                                  
-        self._vpc.add_interface_endpoint("CWLogsEndpoint", service=ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,security_groups=[self._vpc_endpoint_sg])
+        # self._vpc.add_interface_endpoint("CWLogsEndpoint", service=ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,security_groups=[self._vpc_endpoint_sg])
 
 

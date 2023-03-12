@@ -7,7 +7,7 @@ The infrastructure deployment includes the following:
 - A new S3 bucket to store sample data and stream job code
 - An EKS cluster in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
-    - It also has a Fargate profile labelled with the value `serverless`
+    - attach to EFS file system
 - An EMR virtual cluster in the same VPC
     - The virtual cluster links to `emr` namespace 
     - The namespace accommodates two types of Spark jobs, ie. run on managed node group or serverless job on Fargate

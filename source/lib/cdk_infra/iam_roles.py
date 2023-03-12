@@ -15,9 +15,9 @@ class IamConst(Construct):
     def admin_role(self):
         return self._clusterAdminRole
     
-    @property
-    def fg_pod_role(self):
-        return self._fg_pod_role    
+    # @property
+    # def fg_pod_role(self):
+    #     return self._fg_pod_role    
 
     @property
     def emr_svc_role(self):
@@ -59,12 +59,12 @@ class IamConst(Construct):
         )
         self._managed_node_role.apply_removal_policy(RemovalPolicy.DESTROY)
 
-        # Fargate pod execution role
-        self._fg_pod_role = iam.Role(self, "FargatePodExecRole",
-            path='/',
-            assumed_by=iam.ServicePrincipal('eks-fargate-pods.amazonaws.com'),
-            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AmazonEKSFargatePodExecutionRolePolicy')]
-        )
+        # # Fargate pod execution role
+        # self._fg_pod_role = iam.Role(self, "FargatePodExecRole",
+        #     path='/',
+        #     assumed_by=iam.ServicePrincipal('eks-fargate-pods.amazonaws.com'),
+        #     managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AmazonEKSFargatePodExecutionRolePolicy')]
+        # )
 
         # EMR container service role
         self._emrsvcrole = iam.Role.from_role_arn(self, "EmrSvcRole", 
