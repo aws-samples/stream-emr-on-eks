@@ -23,10 +23,6 @@ class SparkOnEksConst(Construct):
         return self.emr_vc.attr_id
 
     @property
-    def EMRFargateVC(self):
-        return self.emr_vc_fg.attr_id    
-
-    @property
     def EMRExecRole(self):
         return self._emr_exec_role.role_arn 
 
@@ -39,44 +35,6 @@ class SparkOnEksConst(Construct):
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'  
    
-# //****************************************************************************************//
-# //************************** SETUP PERMISSION FOR OSS SPARK JOBS *************************//
-# //******* create k8s namespace, service account, and IAM role for service account ********//
-# //***************************************************************************************//
-
-        # create k8s namespace
-        etl_ns = eks_cluster.add_manifest('SparkNamespace',{
-                "apiVersion": "v1",
-                "kind": "Namespace",
-                "metadata": { 
-                    "name": "spark",
-                    "labels": {"name":"spark"}
-                }
-            }
-        )  
-        
-        self._spark_sa = eks_cluster.add_service_account('NativeSparkSa',
-            name='nativejob',
-            namespace='spark'
-        )
-        self._spark_sa.node.add_dependency(etl_ns)
-
-        _spark_rb = eks_cluster.add_manifest('sparkRoleBinding',
-            load_yaml_replace_var_local(source_dir+'/app_resources/native-spark-rbac.yaml',
-                fields= {
-                    "{{MY_SA}}": self._spark_sa.service_account_name
-                })
-        )
-        _spark_rb.node.add_dependency(self._spark_sa)
-
-        _native_spark_iam = load_yaml_replace_var_local(source_dir+'/app_resources/native-spark-iam-role.yaml',
-            fields={
-                 "{{codeBucket}}": code_bucket
-            }
-        )
-        for statmnt in _native_spark_iam:
-            self._spark_sa.add_to_principal_policy(iam.PolicyStatement.from_json(statmnt))
-
 # # //*************************************************************************************//
 # # //******************** SETUP PERMISSION FOR EMR ON EKS   *****************************//
 # # //***********************************************************************************//
@@ -96,16 +54,6 @@ class SparkOnEksConst(Construct):
                 }
             }
         )
-        _emr_02_name = "emrs-workshop"
-        emr_serverless_ns = eks_cluster.add_manifest('EMRFargateNamespace',{
-                "apiVersion": "v1",
-                "kind": "Namespace",
-                "metadata": { 
-                    "name": _emr_02_name,
-                    "labels": {"name": _emr_01_name}
-                }
-            }
-        )
 
         ###########################################
         #######                             #######
@@ -121,16 +69,6 @@ class SparkOnEksConst(Construct):
             multi_resource=True)
         )
         _emr_rb.node.add_dependency(emr_ns)
-
-        _emr_fg_rb = KubernetesManifest(self,'EMRFargateRoleBinding',
-            cluster=eks_cluster,
-            manifest=load_yaml_replace_var_local(source_dir+'/app_resources/emr-rbac.yaml', 
-            fields= {
-                "{{NAMESPACE}}": _emr_02_name
-            }, 
-            multi_resource=True)
-        )
-        _emr_fg_rb.node.add_dependency(emr_serverless_ns)
 
         # Create EMR on EKS job executor role
         #######################################
@@ -194,14 +132,3 @@ class SparkOnEksConst(Construct):
         )
         self.emr_vc.node.add_dependency(self._emr_exec_role)
         self.emr_vc.node.add_dependency(_emr_rb)
-
-        self.emr_vc_fg = emrc.CfnVirtualCluster(self,"EMRServerlessCluster",
-            container_provider=emrc.CfnVirtualCluster.ContainerProviderProperty(
-                id=eks_cluster.cluster_name,
-                info=emrc.CfnVirtualCluster.ContainerInfoProperty(eks_info=emrc.CfnVirtualCluster.EksInfoProperty(namespace=_emr_02_name)),
-                type="EKS"
-            ),
-            name="EMROnEKSFargate"
-        )
-        self.emr_vc_fg.node.add_dependency(self._emr_exec_role) 
-        self.emr_vc_fg.node.add_dependency(_emr_fg_rb) 

@@ -16,13 +16,11 @@ aws configure get default.region
 export S3BUCKET=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='CODEBUCKET'].OutputValue" --output text)
 export MSK_SERVER=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='MSKBROKER'].OutputValue" --output text)
 export VIRTUAL_CLUSTER_ID=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='VirtualClusterId'].OutputValue" --output text)
-export SERVERLESS_VIRTUAL_CLUSTER_ID=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='FargateVirtualClusterId'].OutputValue" --output text)
 export EMR_ROLE_ARN=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?OutputKey=='EMRExecRoleARN'].OutputValue" --output text)
 
 echo "export S3BUCKET=${S3BUCKET}" | tee -a ~/.bash_profile
 echo "export MSK_SERVER=${MSK_SERVER}" | tee -a ~/.bash_profile
 echo "export VIRTUAL_CLUSTER_ID=${VIRTUAL_CLUSTER_ID}" | tee -a ~/.bash_profile
-echo "export SERVERLESS_VIRTUAL_CLUSTER_ID=${SERVERLESS_VIRTUAL_CLUSTER_ID}" | tee -a ~/.bash_profile
 echo "export EMR_ROLE_ARN=${EMR_ROLE_ARN}" | tee -a ~/.bash_profile
 
 # 1. install k8s command tools

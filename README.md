@@ -14,11 +14,6 @@ The infrastructure deployment includes the following:
 - A MSK Cluster in the same VPC with 2 brokers in total. Kafka version is 2.8.1.
     - A Cloud9 IDE as the command line environment in the demo. 
     - Kafka Client tool will be installed on the Cloud9 IDE
-- An EMR on EC2 cluster with managed scaling enabled.
-    - 1 primary and 1 core nodes with r5.xlarge.
-    - configured to run one Spark job at a time.
-    - can scale from 1 to 10 core + task nodes
-    - mounted EFS for checkpointing test/demo (a bootstrap action) 
 
 ### CloudFormation Deployment
 

@@ -28,10 +28,6 @@ class SparkOnEksStack(Stack):
         return self.emr.EMRVC
 
     @property
-    def EMRFargateVC(self):
-        return self.emr.EMRFargateVC    
-
-    @property
     def EMRExecRole(self):
         return self.emr.EMRExecRole    
         
