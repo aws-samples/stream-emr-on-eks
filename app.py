@@ -27,6 +27,8 @@ CfnOutput(eks_stack,"MSK_CLIENT_URL",
     value=f"https://{Aws.REGION}.console.aws.amazon.com/cloud9/home/environments/{msk_stack.Cloud9URL}?permissions=owner",
     description="Cloud9 Url, Use this URL to access your command line environment in a browser"
 )
+
+
 CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
 CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)

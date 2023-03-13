@@ -11,7 +11,7 @@
 # and limitations under the License.  																				#                                                                              #
 ######################################################################################################################
 
-from aws_cdk import (RemovalPolicy,NestedStack,aws_cloud9 as cloud9,aws_ec2 as ec2, aws_msk_alpha as msk)
+from aws_cdk import (RemovalPolicy,NestedStack,aws_cloud9 as cloud9,aws_ec2 as ec2, aws_msk_alpha as msk, Aws)
 from constructs import Construct
 class MSKStack(NestedStack):
 
