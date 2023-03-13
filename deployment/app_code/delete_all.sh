@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export stack_name="${1:-StreamOnEKS}"
+export stack_name="${1:-emr-roadshow}"
 
 # delete EMR virtual cluster if needed
 emr_cv=$(aws emr-containers list-virtual-clusters --state ARRESTED --query 'virtualClusters[*].id' --output text)

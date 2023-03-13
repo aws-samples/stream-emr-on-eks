@@ -97,8 +97,10 @@ class IamConst(Construct):
                 ]
         ))
         self._cloud9_role.add_to_policy(iam.PolicyStatement(
-            resources=[f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/v1/clusters"],
-            actions=["kafka:ListClusters"]
+            resources=[
+                f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/v1/clusters",
+                f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/api/v2/clusters"],
+            actions=["kafka:ListClusters","kafka:ListClustersV2"]
         ))
         self._cloud9_role.add_to_policy(iam.PolicyStatement(
             resources=[f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/v1/configurations"],

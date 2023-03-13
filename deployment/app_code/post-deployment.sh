@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export stack_name="${1:-emrroadshow}"
+export stack_name="${1:-emr-roadshow}"
 
 # 0. Setup AWS environment
 echo "Setup AWS environment ..."

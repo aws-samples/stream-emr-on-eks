@@ -28,11 +28,13 @@ class MSKStack(NestedStack):
         super().__init__(scope, id, **kwargs)
 
         # launch Cloud9 as Kafka client
+        # designed for workshop studio only
         self._c9env = cloud9.CfnEnvironmentEC2(self, "KafkaClientEnv", 
             name= "kafka_client",
             instance_type="t3.small",
             subnet_id=eksvpc.public_subnets[0].subnet_id,
-            automatic_stop_time_minutes=60
+            automatic_stop_time_minutes=4320,
+            owner_arn=f"arn:aws:sts::{Aws.ACCOUNT_ID}:assumed-role/WSParticipantRole/Participant"
         )
         self._c9env.apply_removal_policy(RemovalPolicy.DESTROY)
 
