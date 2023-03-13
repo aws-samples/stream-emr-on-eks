@@ -45,7 +45,7 @@ Two ways to deploy:
   |   Region  |   Launch Template |
   |  ---------------------------   |   -----------------------  |
   |  ---------------------------   |   -----------------------  |
-  **US East (N. Virginia)**| [![Deploy to AWS](source/app_resources/00-deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?stackName=StreamOnEKS&templateURL=https://blogpost-sparkoneks-us-east-1.s3.amazonaws.com/emr-stream-demo/v2.0.0/StreamOnEKS.template) 
+  **US East (N. Virginia)**| [![Deploy to AWS](source/app_resources/00-deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?stackName=emr-stream-demo&templateURL=https://blogpost-sparkoneks-us-east-1.s3.amazonaws.com/emr-stream-demo/v2.0.0/emr-stream-demo.template) 
 
 * To launch in a different AWS Region, check out the following customization section, or use the CDK deployment option.
 
@@ -66,7 +66,7 @@ aws s3 mb s3://$BUCKET_NAME_PREFIX-$AWS_REGION --region $AWS_REGION
 aws s3 cp ./deployment/global-s3-assets/ s3://$BUCKET_NAME_PREFIX-$AWS_REGION/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control
 aws s3 cp ./deployment/regional-s3-assets/ s3://$BUCKET_NAME_PREFIX-$AWS_REGION/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control
 
-echo -e "\nIn web browser, paste the URL to launch the template: https://console.aws.amazon.com/cloudformation/home?region=$AWS_REGION#/stacks/quickcreate?stackName=StreamOnEKS&templateURL=https://$BUCKET_NAME_PREFIX-$AWS_REGION.s3.amazonaws.com/$SOLUTION_NAME/$VERSION/StreamOnEKS.template\n"
+echo -e "\nIn web browser, paste the URL to launch the template: https://console.aws.amazon.com/cloudformation/home?region=$AWS_REGION#/stacks/quickcreate?stackName=emr-stream-demo&templateURL=https://$BUCKET_NAME_PREFIX-$AWS_REGION.s3.amazonaws.com/$SOLUTION_NAME/$VERSION/emr-stream-demo.template\n"
 ```
 
 ### CDK Deployment
@@ -116,11 +116,11 @@ curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/main/deploy
 6. Launching a new termnial window in Cloud9, send the sample data to MSK:
 ```bash
 wget https://github.com/xuite627/workshop_flink1015-1/raw/master/dataset/nycTaxiRides.gz
-zcat https://github.com/xuite627/workshop_flink1015-1/raw/master/dataset/nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.2.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.2"  > /dev/null
+zcat nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.8.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.2"  > /dev/null
 ```
 6. Launching the 3rd termnial window and monitor the source MSK topic:
 ```bash
-kafka_2.12-2.2.1/bin/kafka-console-consumer.sh \
+kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \
 --topic taxirides \
 --from-beginning
@@ -162,7 +162,7 @@ kubectl get po -n emr
 
 # verify in EMR console
 # in Cloud9, run the consumer tool to check if any data comeing through in the target Kafka topic
-kafka_2.12-2.2.1/bin/kafka-console-consumer.sh --bootstrap-server ${MSK_SERVER} --topic emreks_output --from-beginning
+kafka_2.12-2.8.1/bin/kafka-console-consumer.sh --bootstrap-server ${MSK_SERVER} --topic emreks_output --from-beginning
 ```
 ### Cancel the long-running job (can get job id from the job submission output or in EMR console)
 ```bash
@@ -201,7 +201,7 @@ kubectl get po -n emr
 
 # verify in EMR console
 # in Cloud9, run the consumer tool to check if any data comeing through in the target Kafka topic
-kafka_2.12-2.2.1/bin/kafka-console-consumer.sh \
+kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \
 --topic emreksfg_output \
 --from-beginning
@@ -222,7 +222,7 @@ aws emr add-steps \
 ```bash
 # verify in EMR console
 # in Cloud9, run the consumer tool to check if any data comeing through in the target Kafka topic
-kafka_2.12-2.2.1/bin/kafka-console-consumer.sh \
+kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \
 --topic emrec2_output \
 --from-beginning

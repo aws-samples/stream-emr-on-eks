@@ -7,7 +7,7 @@ const fs = require('fs');
 // Paths
 var currentPath = process.cwd();
 const global_s3_assets = currentPath+'/../deployment/global-s3-assets';
-const solution_name='StreamOnEKS';
+const solution_name='emr-stream-demo';
 
 function setParameter(template) {
     const parameters = (template.Parameters) ? template.Parameters : {};
