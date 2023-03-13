@@ -24,10 +24,9 @@ Tags.of(msk_stack).add('project', proj_name)
 # Deployment Output
 CfnOutput(eks_stack,'CODE_BUCKET', value=eks_stack.code_bucket)
 CfnOutput(eks_stack,"MSK_CLIENT_URL",
-    value=f"https://{Aws.REGION}.console.aws.amazon.com/cloud9/home/environments/{msk_stack.Cloud9URL}?permissions=owner",
+    value=f"https://{Aws.REGION}.console.aws.amazon.com/cloud9/ide/{msk_stack.Cloud9URL}",
     description="Cloud9 Url, Use this URL to access your command line environment in a browser"
 )
-
 
 CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
