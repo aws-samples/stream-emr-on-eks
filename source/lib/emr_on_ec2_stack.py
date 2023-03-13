@@ -50,7 +50,8 @@ class EMREC2Stack(NestedStack):
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonElasticMapReduceforEC2Role"),
                 iam.ManagedPolicy.from_aws_managed_policy_name("AmazonMSKFullAccess"),
-                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticFileSystemReadOnlyAccess")
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElasticFileSystemReadOnlyAccess"),
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSSMManagedInstanceCore")
             ]
         )
         _iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-iam-role.yaml', 
@@ -95,7 +96,7 @@ class EMREC2Stack(NestedStack):
             visible_to_all_users=True,
             service_role=svc_role.role_name,
             job_flow_role=emr_job_role.role_name,
-            tags=[CfnTag(key="project", value="emr-stream-demo")],
+            tags=[CfnTag(key="project", value=cluster_name)],
             instances=CfnCluster.JobFlowInstancesConfigProperty(
                 termination_protected=False,
                 master_instance_group=CfnCluster.InstanceGroupConfigProperty(
