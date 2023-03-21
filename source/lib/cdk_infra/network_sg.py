@@ -11,7 +11,7 @@
 # and limitations under the License.  																				#                                                                              #
 ######################################################################################################################
 from constructs import Construct
-from aws_cdk import (Tags, aws_ec2 as ec2)
+from aws_cdk import (RemovalPolicy, Tags, aws_ec2 as ec2)
 
 class NetworkSgConst(Construct):
 
@@ -28,6 +28,7 @@ class NetworkSgConst(Construct):
         # create VPC
         self._vpc = ec2.Vpc(self, 'eksVpc',max_azs=2, nat_gateways=1)
         Tags.of(self._vpc).add('Name', eksname + 'EksVpc')
+        self._vpc.apply_removal_policy(RemovalPolicy.DESTROY)
 
         # VPC endpoint security group
         self._vpc_endpoint_sg = ec2.SecurityGroup(self,'EndpointSg',

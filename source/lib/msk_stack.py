@@ -11,8 +11,10 @@
 # and limitations under the License.  																				#                                                                              #
 ######################################################################################################################
 
-from aws_cdk import (Aws,RemovalPolicy,NestedStack,aws_cloud9 as cloud9,aws_ec2 as ec2, aws_msk_alpha as msk,aws_iam as iam)
+from aws_cdk import (Aws,RemovalPolicy,NestedStack,aws_cloud9 as cloud9, aws_ec2 as ec2, aws_msk_alpha as msk,aws_iam as iam)
 from constructs import Construct
+import boto3
+
 class MSKStack(NestedStack):
 
     @property
@@ -29,27 +31,27 @@ class MSKStack(NestedStack):
 
         # launch Cloud9 as Kafka client
         # the owner_arn could be the fix arn designed for workshop studio or environment creator
-        _existing = iam.Role.from_role_arn(self, "workshopRoleCheck", f"arn:aws:sts::{Aws.ACCOUNT_ID}:assumed-role/WSParticipantRole/Participant")
-        if _existing:
-            self._c9env = cloud9.CfnEnvironmentEC2(self, "KafkaClientEnv", 
-                name= "kafka_client",
+        iam_client = boto3.client("iam")
+        try:
+            iam_client.get_role(RoleName='WSParticipantRole')
+            self._c9env = cloud9.CfnEnvironmentEC2(self, "kafkaClientEnv1", 
+                name="workshop_ide",
                 instance_type="t3.small",
                 subnet_id=eksvpc.public_subnets[0].subnet_id,
                 automatic_stop_time_minutes=300,
-                owner_arn=_existing.role_arn
+                owner_arn=f"arn:aws:sts::{Aws.ACCOUNT_ID}:assumed-role/WSParticipantRole/Participant"
             )
-        else:
-            self._c9env = cloud9.CfnEnvironmentEC2(self, "KafkaClientEnv", 
-                name= "kafka_client",
+        except iam_client.exceptions.NoSuchEntityException:
+            self._c9env = cloud9.CfnEnvironmentEC2(self, "KafkaClientEnv2", 
+                name="workshop_ide",
                 instance_type="t3.small",
                 subnet_id=eksvpc.public_subnets[0].subnet_id,
                 automatic_stop_time_minutes=300
             )
+        finally:    
+            self._c9env.apply_removal_policy(RemovalPolicy.DESTROY)
 
-       
-        self._c9env.apply_removal_policy(RemovalPolicy.DESTROY)
-
-        # # create MSK Cluster
+        # # create MSK Clusters
         # self._msk_cluster = msk.Cluster(self, "EMR-EKS-stream",
         #     cluster_name=cluster_name,
         #     kafka_version=msk.KafkaVersion.V2_8_1,
