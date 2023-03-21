@@ -109,7 +109,8 @@ class SparkOnEksConst(Construct):
         # custom policy      
         _emr_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-iam-role.yaml',
             fields={
-                 "{{codeBucket}}": code_bucket
+                 "{{codeBucket}}": code_bucket,
+                 "{{AccountID}}": Aws.ACCOUNT_ID
             }
         )
         for statmnt in _emr_iam:

@@ -1,0 +1,18 @@
+- Effect: Allow
+  Action:
+  - lakeformation:GetDataAccess
+  - glue:GetTable
+  - glue:GetTables
+  - glue:SearchTables
+  - glue:GetDatabase
+  - glue:GetDatabases
+  - glue:GetPartitions
+  - glue:GetPartition
+  # - glue:CreateDatabase
+  - lakeformation:GetResourceLFTags
+  - lakeformation:ListLFTags
+  - lakeformation:GetLFTag
+  - lakeformation:SearchTablesByLFTags
+  - lakeformation:SearchDatabasesByLFTags
+  Resource: 
+    - "*"

@@ -1,0 +1,54 @@
+- Effect: Allow
+  Action:
+  - elasticmapreduce:ListInstances
+  - elasticmapreduce:DescribeCluster
+  - elasticmapreduce:DescribeSecurityConfiguration
+  - elasticmapreduce:CreatePersistentAppUI
+  - elasticmapreduce:DescribePersistentAppUI
+  - elasticmapreduce:GetPersistentAppUIPresignedURL
+  - elasticmapreduce:GetOnClusterAppUIPresignedURL
+  - elasticmapreduce:ListClusters
+  Resource: 
+    - "*"
+- Effect: Allow
+  Action:
+  - elasticmapreduce:DescribeCluster
+  - elasticmapreduce:ListInstanceGroups
+  Resource: arn:aws:elasticmapreduce:*:*:cluster/*
+- Effect: Allow
+  Action:
+  - elasticmapreduce:ListClusters
+  Resource: 
+    - "*"
+- Effect: Allow
+  Sid: AllowPassRoleSageMaker
+  Action:
+  - iam:PassRole
+  Resource:
+  - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
+  - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+- Effect: Allow
+  Sid: AllowGetRoleSageMaker
+  Action:
+  - iam:GetRole
+  - iam:ListRoles
+  Resource:
+  - arn:aws:iam::{{AccountID}}:role/*
+- Effect: Allow
+  Sid: AllowClusterCreds
+  Action:
+  - elasticmapreduce:GetClusterSessionCredentials
+  Condition:
+    StringLike:
+      elasticmapreduce:ExecutionRoleArn:
+      - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
+      - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+  Resource: 
+    - "*"
+- Effect: Allow
+  Action:
+  - logs:CreateLogStream
+  - logs:CreateLogGroup
+  - logs:PutLogEvents
+  Resource:
+  - arn:aws:logs:*:*:*

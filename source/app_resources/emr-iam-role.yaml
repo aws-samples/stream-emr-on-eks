@@ -3,14 +3,14 @@
     - s3:ListBucket
     Resource:
     - arn:aws:s3:::{{codeBucket}}
-    - arn:aws:s3:::amazon-reviews-pds
+    - arn:aws:s3:::aws-dataengineering-day.workshop.aws
   - Effect: Allow
     Action:
     - s3:PutObject
     - s3:GetObject
     Resource:
     - arn:aws:s3:::{{codeBucket}}/*
-    - arn:aws:s3:::amazon-reviews-pds/parquet/*
+    - arn:aws:s3:::aws-dataengineering-day.workshop.aws/data/dms_sample/*
   - Effect: Allow
     Action:
     - s3:DeleteObject
@@ -41,3 +41,13 @@
     - kinesis:DeleteStream
     Resource:
       - '*'     
+  - Effect: Allow
+    Sid: AllowEMREC2ProfileRoleToAssumeEMRRuntimeRoles
+    Action:
+    - sts:AssumeRole
+    - sts:TagSession
+    - iam:GetRole
+    Resource:
+    - arn:aws:iam::{{AccountID}}:role/lf-sagemaker-role  
+    - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer 
+    - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst  

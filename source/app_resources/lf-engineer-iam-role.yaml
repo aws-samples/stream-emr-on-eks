@@ -1,0 +1,35 @@
+- Effect: Allow
+  Action:
+  - lakeformation:GetDataAccess
+  - glue:GetTable
+  - glue:GetTables
+  - glue:SearchTables
+  - glue:GetDatabase
+  - glue:GetDatabases
+  - glue:GetPartitions
+  - glue:GetPartition
+  - glue:CreateDatabase
+  - glue:GetUserDefinedFunctions
+  - glue:CreateTable
+  - glue:UpdateTable
+  - lakeformation:GetResourceLFTags
+  - lakeformation:ListLFTags
+  - lakeformation:GetLFTag
+  - lakeformation:SearchTablesByLFTags
+  - lakeformation:SearchDatabasesByLFTags
+  Resource: 
+    - "*"
+- Effect: Allow
+  Action:
+  - logs:CreateLogStream
+  - logs:CreateLogGroup
+  - logs:PutLogEvents
+  Resource:
+  - arn:aws:logs:{{REGION}}:{{AccountID}}:log-group:/aws-lakeformation-acceleration/*
+  - arn:aws:logs:{{REGION}}:{{AccountID}}:log-group:/aws-lakeformation-acceleration/*:log-stream:*
+- Sid: PassRolePermissions
+  Effect: Allow
+  Action:
+  - iam:PassRole
+  Resource:
+  - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer

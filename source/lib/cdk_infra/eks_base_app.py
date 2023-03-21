@@ -22,22 +22,22 @@ class EksBaseAppConst(Construct):
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
         
-        # Add ALB ingress controller to EKS
-        self._alb = eks_cluster.add_helm_chart('ALBChart',
-            chart='aws-load-balancer-controller',
-            repository='https://aws.github.io/eks-charts',
-            release='alb',
-            version='1.2.7',
-            create_namespace=False,
-            namespace='kube-system',
-            values=load_yaml_replace_var_local(source_dir+'/app_resources/alb-values.yaml',
-                fields={
-                    "{{region_name}}": Aws.REGION, 
-                    "{{cluster_name}}": eks_cluster.cluster_name, 
-                    "{{vpc_id}}": eks_cluster.vpc.vpc_id
-                }
-            )
-        )
+        # # Add ALB ingress controller to EKS
+        # self._alb = eks_cluster.add_helm_chart('ALBChart',
+        #     chart='aws-load-balancer-controller',
+        #     repository='https://aws.github.io/eks-charts',
+        #     release='alb',
+        #     version='1.2.7',
+        #     create_namespace=False,
+        #     namespace='kube-system',
+        #     values=load_yaml_replace_var_local(source_dir+'/app_resources/alb-values.yaml',
+        #         fields={
+        #             "{{region_name}}": Aws.REGION, 
+        #             "{{cluster_name}}": eks_cluster.cluster_name, 
+        #             "{{vpc_id}}": eks_cluster.vpc.vpc_id
+        #         }
+        #     )
+        # )
         
         # Add Cluster Autoscaler to EKS
         _var_mapping = {
@@ -52,3 +52,4 @@ class EksBaseAppConst(Construct):
             namespace='kube-system',
             values=load_yaml_replace_var_local(source_dir+'/app_resources/autoscaler-values.yaml',_var_mapping)
         )
+        

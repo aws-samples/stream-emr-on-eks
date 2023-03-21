@@ -3,7 +3,8 @@
 
 from constructs import Construct
 from aws_cdk import (RemovalPolicy, Tags, Aws, aws_iam as iam)
-# import typing
+from lib.util.manifest_reader import load_yaml_local,load_yaml_replace_var_local
+import os
 
 class IamConst(Construct):
 
@@ -23,8 +24,19 @@ class IamConst(Construct):
     def emr_svc_role(self):
         return self._emrsvcrole 
 
+    @property
+    def lf_engineer_role(self):
+        return self._engineer_role
+
+    @property
+    def lf_sagemaker_role(self):
+        return self._sm_role 
+       
+
     def __init__(self,scope: Construct, id:str, cluster_name:str, **kwargs,) -> None:
         super().__init__(scope, id, **kwargs)
+
+        source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
 
         # EKS admin role
         self._clusterAdminRole = iam.Role(self, 'ClusterAdmin',
@@ -53,7 +65,6 @@ class IamConst(Construct):
             iam.ManagedPolicy.from_aws_managed_policy_name('CloudWatchAgentServerPolicy'), 
         )
         self._managed_node_role = iam.Role(self,'NodeInstanceRole',
-            path='/',
             assumed_by=iam.ServicePrincipal('ec2.amazonaws.com'),
             managed_policies=list(_managed_node_managed_policies),
         )
@@ -61,11 +72,10 @@ class IamConst(Construct):
 
         # Fargate pod execution role
         self._fg_pod_role = iam.Role(self, "FargatePodExecRole",
-            path='/',
             assumed_by=iam.ServicePrincipal('eks-fargate-pods.amazonaws.com'),
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AmazonEKSFargatePodExecutionRolePolicy')]
         )
-
+        self._fg_pod_role.apply_removal_policy(RemovalPolicy.DESTROY)
         # EMR container service role
         self._emrsvcrole = iam.Role.from_role_arn(self, "EmrSvcRole", 
             role_arn=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/AWSServiceRoleForAmazonEMRContainers", 
@@ -74,7 +84,6 @@ class IamConst(Construct):
 
         # Cloud9 EC2 role
         self._cloud9_role=iam.Role(self,"Cloud9Admin",
-            path='/',
             assumed_by=iam.ServicePrincipal('ec2.amazonaws.com'),
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AWSCloudFormationReadOnlyAccess')]
         )
@@ -82,36 +91,61 @@ class IamConst(Construct):
             resources=[self._clusterAdminRole.role_arn],
             actions=["sts:AssumeRole"]
         ))
-        self._cloud9_role.add_to_policy(iam.PolicyStatement(
-            resources=["*"],
-            actions=[
-                "eks:Describe*",
-                "ssm:GetParameter",
-                "kafka:DescribeCluster",
-                "kafka:UpdateClusterConfiguration",
-                "s3:List*",
-                "s3:GetObject",
-                "elasticmapreduce:ListClusters",
-                "elasticmapreduce:DescribeCluster",
-                "elasticmapreduce:AddJobFlowSteps"
-                ]
-        ))
-        self._cloud9_role.add_to_policy(iam.PolicyStatement(
-            resources=[
-                f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/v1/clusters",
-                f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/api/v2/clusters"],
-            actions=["kafka:ListClusters","kafka:ListClustersV2"]
-        ))
-        self._cloud9_role.add_to_policy(iam.PolicyStatement(
-            resources=[f"arn:aws:kafka:{Aws.REGION}:{Aws.ACCOUNT_ID}:/v1/configurations"],
-            actions=["kafka:CreateConfiguration","kafka:ListConfigurations"]
-        ))
-        self._cloud9_role.add_to_policy(iam.PolicyStatement(
-            resources=[f"arn:aws:emr-containers:{Aws.REGION}:{Aws.ACCOUNT_ID}:/virtualclusters/*"],
-            actions=["emr-containers:StartJobRun"]
-        ))
+        _c9_iam = load_yaml_replace_var_local(source_dir+'/app_resources/cloud9-iam-role.yaml', 
+            fields= {
+                "{{REGION}}": Aws.REGION,
+                "{{AccountID}}": Aws.ACCOUNT_ID
+            })
+        for statmnt in _c9_iam:
+            self._cloud9_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
         iam.CfnInstanceProfile(self,"Cloud9RoleProfile",
             roles=[ self._cloud9_role.role_name],
             instance_profile_name= self._cloud9_role.role_name
         )
         self._cloud9_role.apply_removal_policy(RemovalPolicy.DESTROY)
+
+        # lf data access engineer role
+        self._engineer_role=iam.Role(self,"LFEngineer",
+            role_name="lf-data-access-engineer",
+            assumed_by=iam.CompositePrincipal(
+                    iam.ServicePrincipal("lakeformation.amazonaws.com")
+            ),
+            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess')]
+        )
+        _engineer_iam = load_yaml_replace_var_local(source_dir+'/app_resources/lf-engineer-iam-role.yaml', 
+            fields= {
+                "{{REGION}}": Aws.REGION,
+                "{{AccountID}}": Aws.ACCOUNT_ID
+            })
+        for statmnt in _engineer_iam:
+            self._engineer_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
+        self._engineer_role.apply_removal_policy(RemovalPolicy.DESTROY)
+
+        # lf data access analyst role
+        self._analyst_role=iam.Role(self,"LFAnalyst",
+            role_name="lf-data-access-analyst",
+            assumed_by=iam.ServicePrincipal('lakeformation.amazonaws.com'),
+            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess')]
+        )
+        _analyst_iam = load_yaml_local(source_dir+'/app_resources/lf-analyst-iam-role.yaml')
+        for statmnt in _analyst_iam:
+            self._analyst_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
+        self._analyst_role.apply_removal_policy(RemovalPolicy.DESTROY)
+
+        # lf sagemaker role
+        self._sm_role=iam.Role(self,"sagemaker",
+            role_name="lf-sagemaker-role",  
+            assumed_by=iam.ServicePrincipal('sagemaker.amazonaws.com')
+        )
+        _sm_iam = load_yaml_replace_var_local(source_dir+'/app_resources/lf-sagemaker-role.yaml', 
+            fields= {
+                "{{AccountID}}": Aws.ACCOUNT_ID
+            })
+        for statmnt in _sm_iam:
+            self._sm_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
+        self._sm_role.apply_removal_policy(RemovalPolicy.DESTROY)
+        

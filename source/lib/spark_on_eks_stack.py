@@ -21,7 +21,6 @@ class SparkOnEksStack(Stack):
     @property
     def eksvpc(self):
         return self.network_sg.vpc
-       
 
     @property
     def EMRVC(self):
@@ -30,6 +29,15 @@ class SparkOnEksStack(Stack):
     @property
     def EMRExecRole(self):
         return self.emr.EMRExecRole    
+
+    @property
+    def LFEngineerRole(self):
+        return self.iam.lf_engineer_role       
+
+    @property
+    def LFSagemakerRole(self):
+        return self.iam.lf_sagemaker_role     
+        
         
     def __init__(self, scope: Construct, id: str, eksname: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -39,8 +47,8 @@ class SparkOnEksStack(Stack):
 
         # 2. EKS base infra
         self.network_sg = NetworkSgConst(self,'network-sg', eksname)
-        iam = IamConst(self,'iam_roles', eksname)
-        self.eks_cluster = EksConst(self,'eks_cluster', eksname, self.network_sg.vpc, iam.managed_node_role, iam.admin_role, iam.emr_svc_role, iam.fg_pod_role)
+        self.iam = IamConst(self,'iam_roles', eksname)
+        self.eks_cluster = EksConst(self,'eks_cluster', eksname, self.network_sg.vpc, self.iam.managed_node_role, self.iam.admin_role, self.iam.emr_svc_role, self.iam.fg_pod_role)
         EksSAConst(self, 'eks_service_account', self.eks_cluster.my_cluster)
         EksBaseAppConst(self, 'eks_base_app', self.eks_cluster.my_cluster)
 

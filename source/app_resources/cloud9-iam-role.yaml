@@ -1,0 +1,48 @@
+- Effect: Allow
+  Action:
+  - ssm:GetParameter
+  - kafka:DescribeCluster
+  - kafka:UpdateClusterConfiguration
+  - eks:Describe*
+  - s3:List*
+  - s3:GetObject
+  - elasticmapreduce:ListClusters
+  - elasticmapreduce:DescribeCluster
+  - elasticmapreduce:AddJobFlowSteps
+  Resource: 
+    - "*"
+- Effect: Allow
+  Action:
+  - kafka:ListClusters
+  - kafka:ListClustersV2
+  - kafka:CreateConfiguration
+  - kafka:ListConfigurations
+  Resource:
+  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/v1/clusters
+  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/api/v2/clusters
+  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/v1/configurations
+- Effect: Allow
+  Action:
+  - emr-containers:StartJobRun
+  Resource: 
+  - arn:aws:emr-containers:{{REGION}}:{{AccountID}}:/virtualclusters/*
+- Effect: Allow
+  Sid: AllowPassRoleSageMaker
+  Action:
+  - iam:GetRole
+  - iam:PassRole
+  - iam:GetRole
+  Resource:
+  - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
+  - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+- Effect: Allow
+  Sid: AllowClusterCreds
+  Action:
+  - elasticmapreduce:GetClusterSessionCredentials
+  Condition:
+    StringLike:
+      elasticmapreduce:ExecutionRoleArn:
+      - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
+      - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+  Resource: 
+    - "*"

@@ -2,14 +2,18 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 #
 from constructs import Construct
-from aws_cdk import (Aws,NestedStack,RemovalPolicy,Tags,CfnTag,aws_iam as iam,aws_ec2 as ec2,aws_efs as efs)
-from aws_cdk.aws_emr import CfnCluster
+from aws_cdk import (CfnOutput, Aws, NestedStack, RemovalPolicy, Tags, CfnTag, aws_iam as iam, aws_ec2 as ec2, aws_efs as efs, aws_sagemaker as sm)
+from aws_cdk.aws_emr import CfnCluster,CfnStep
 from lib.util.manifest_reader import load_yaml_replace_var_local
 import os
 
 class EMREC2Stack(NestedStack):
+    @property
+    def livy_sg(self):
+        return self._instances.additional_master_security_groups[0]
 
-    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, **kwargs) -> None:
+
+    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, engineer_role: iam.IRole, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
@@ -44,8 +48,8 @@ class EMREC2Stack(NestedStack):
         #######  EMR Roles  #######
         #######             #######
         ###########################
-        # emr job flow role
-        emr_job_role = iam.Role(self,"EMRJobRole",
+        # EMR EC2 instance profile role
+        _emr_job_role = iam.Role(self,"EMRJobRole",
             assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"),
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonElasticMapReduceforEC2Role"),
@@ -56,67 +60,94 @@ class EMREC2Stack(NestedStack):
         )
         _iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-iam-role.yaml', 
             fields= {
-                "{{codeBucket}}": code_bucket
+                "{{codeBucket}}": code_bucket,
+                "{{AccountID}}": Aws.ACCOUNT_ID
             })
         for statmnt in _iam:
-            emr_job_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+            _emr_job_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
         )
 
         # emr service role
         svc_role = iam.Role(self,"EMRSVCRole",
             assumed_by=iam.ServicePrincipal("elasticmapreduce.amazonaws.com"),
             managed_policies=[
-                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEMRServicePolicy_v2")
+                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonElasticMapReduceRole")
             ]
         )
         svc_role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
-                resources=[emr_job_role.role_arn],
+                resources=[_emr_job_role.role_arn],
                 conditions={"StringEquals": {"iam:PassedToService": "ec2.amazonaws.com"}},
             )
         )
 
         # emr job flow profile
         emr_job_flow_profile = iam.CfnInstanceProfile(self,"EMRJobflowProfile",
-            roles=[emr_job_role.role_name],
-            instance_profile_name=emr_job_role.role_name
+            roles=[_emr_job_role.role_name],
+            instance_profile_name=_emr_job_role.role_name
+        )
+
+        _prin_policy = load_yaml_replace_var_local(source_dir+'/app_resources/lf-engineer-iam-trustpolicy.yaml', 
+            fields= {
+                "{{EmrEc2ProfileRole}}": _emr_job_role.role_arn
+            })
+        for statmnt in _prin_policy:
+            engineer_role.assume_role_policy.add_statements(iam.PolicyStatement.from_json(statmnt)
+        )
+
+        #########################################
+        #######                           #######
+        #######  Additional master SG     #######
+        #######                           #######
+        #########################################
+
+        _livy_sg=ec2.SecurityGroup(self, "LivySG",
+            vpc=eksvpc,
+            description="additional primary sg with a new ingress rule"
+        )
+
+        self._instances=CfnCluster.JobFlowInstancesConfigProperty(
+            additional_master_security_groups=[_livy_sg.security_group_id],
+            termination_protected=False,
+            ec2_subnet_id=eksvpc.public_subnets[0].subnet_id,
+            master_instance_group=CfnCluster.InstanceGroupConfigProperty(
+                instance_count=1, 
+                instance_type="r5.xlarge", 
+                market="ON_DEMAND"
+            ),
+            core_instance_group=CfnCluster.InstanceGroupConfigProperty(
+                instance_count=1, 
+                instance_type="r5.xlarge", 
+                market="ON_DEMAND",
+                ebs_configuration=CfnCluster.EbsConfigurationProperty(
+                    ebs_block_device_configs=[CfnCluster.EbsBlockDeviceConfigProperty(
+                    volume_specification=CfnCluster.VolumeSpecificationProperty(
+                        size_in_gb=100,
+                        volume_type='gp2'))
+                ])
+            )
         )
 
         ####################################
         #######                      #######
         #######  Create EMR Cluster  #######
         #######                      #######
-        ####################################
+        ####################################   
+
         emr_c = CfnCluster(self,"emr_ec2_cluster",
             name=cluster_name,
-            applications=[CfnCluster.ApplicationProperty(name="Spark")],
+            applications=[CfnCluster.ApplicationProperty(name="Spark"),
+                          CfnCluster.ApplicationProperty(name="Hive"),
+                          CfnCluster.ApplicationProperty(name="Livy")
+                         ],
             log_uri=f"s3://{code_bucket}/elasticmapreduce/",
             release_label=emr_version,
             visible_to_all_users=True,
             service_role=svc_role.role_name,
-            job_flow_role=emr_job_role.role_name,
+            job_flow_role=_emr_job_role.role_name,
             tags=[CfnTag(key="project", value=cluster_name)],
-            instances=CfnCluster.JobFlowInstancesConfigProperty(
-                termination_protected=False,
-                master_instance_group=CfnCluster.InstanceGroupConfigProperty(
-                    instance_count=1, 
-                    instance_type="r5.xlarge", 
-                    market="ON_DEMAND"
-                ),
-                core_instance_group=CfnCluster.InstanceGroupConfigProperty(
-                    instance_count=1, 
-                    instance_type="r5.xlarge", 
-                    market="ON_DEMAND",
-                    ebs_configuration=CfnCluster.EbsConfigurationProperty(
-                        ebs_block_device_configs=[CfnCluster.EbsBlockDeviceConfigProperty(
-                        volume_specification=CfnCluster.VolumeSpecificationProperty(
-                            size_in_gb=100,
-                            volume_type='gp2'))
-                    ])
-                ),
-                ec2_subnet_id=eksvpc.public_subnets[0].subnet_id
-            ),
+            instances=self._instances,
             configurations=[
                 # use python3 for pyspark
                 CfnCluster.ConfigurationProperty(
@@ -152,6 +183,14 @@ class EMREC2Stack(NestedStack):
                     path=f"s3://{code_bucket}/app_code/job/emr-mount-efs.sh",
                     args=[_efs.file_system_id, Aws.REGION]
                 )
+            )],
+            steps=[CfnCluster.StepConfigProperty(
+                hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
+                    jar="command-runner.jar",
+                    args=["sh", "hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
+                ),
+                name="cpHudiLib",
+                action_on_failure="CANCEL_AND_WAIT"
             )]
         )
         emr_c.add_dependency(emr_job_flow_profile)

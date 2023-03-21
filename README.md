@@ -3,7 +3,13 @@
 This is a project developed in Python [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) for APAC EMR roadshow 2023.
 
 The infrastructure deployment includes the following:
-- A new S3 bucket to store sample data and stream job code
+- A new S3 bucket for applications
+    - encrypted by KMS_MANAGED key
+    - auto-upload files from ./deployment/app_code
+- A new DataLake S3 bucket
+    - encrypted by KMS_MANAGED key
+    - registered in Lakeformation as a data lake
+    - naming convention is s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}
 - An EKS cluster v1.24 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
@@ -11,15 +17,20 @@ The infrastructure deployment includes the following:
     - The virtual cluster links to `emr` namespace 
     - The namespace accommodates two types of Spark jobs, ie. run on managed node group or serverless job on Fargate
     - All EMR on EKS configuration are done, including fine-grained access controls for pods by the AWS native solution IAM roles for service accounts
-- A MSK Cluster in the same VPC with 2 brokers in total. Kafka version is 2.8.1.
-    - A Cloud9 IDE as the command line environment in the demo. 
-    - Kafka Client tool will be installed on the Cloud9 IDE
-- An EMR on EC2 cluster with managed scaling enabled.
-    - 1 primary and 1 core nodes with r5.xlarge.
+- A Cloud9 IDE in the same VPC
+    - automatically stop in 5 mins
+- An EMR on EC2 cluster.
+    - 1 primary and 1 core nodes with r5.xlarge
     - configured to run one Spark job at a time.
-    - can scale from 1 to 10 core + task nodes
-    - mounted EFS for checkpointing test/demo (a bootstrap action)
-
+    - managed scaling is enabled, can scale from 1 to 10
+    - mounted EFS for checkpointing test/demo via a bootstrap action
+- A Sagemaker notebook
+    - lf-sagemaker-role: SageMaker notebook instance role with support of EMR runtime role
+    - an instance of notebook with 10GB of volume in a private subnet
+    - no direct internet access
+- Two EMR runtime roles
+    - lf-data-access-engineer: the runtime role with LakeFormation data access permission designed for *Data Engineers* who can create DB and tables etc.
+    - lf-data-access-analyst: the runtime role with LakeFormation data access permission designed for *Data Analyst* who have tag-based LF read-only permission
 ### CloudFormation Deployment
 
   |   Region  |   Launch Template |
@@ -51,14 +62,6 @@ echo -e "\nIn web browser, paste the URL to launch the template: https://console
 
 ### CDK Deployment
 
-#### Prerequisites 
-Install the folowing tools:
-1. [Python 3.6 +](https://www.python.org/downloads/).
-2. [Node.js 10.3.0 +](https://nodejs.org/en/)
-3. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-macos.html#install-macosos-bundled). Configure the CLI by `aws configure`.
-4. [CDK toolkit](https://cdkworkshop.com/15-prerequisites/500-toolkit.html)
-5. [One-off CDK bootstrap](https://cdkworkshop.com/20-typescript/20-create-project/500-deploy.html) for the first time deployment.
-
 #### Deploy
 ```bash
 python3 -m venv .env
@@ -77,9 +80,9 @@ The following `post-deployment.sh` is executable in Linux, not for Mac OSX. Modi
 VPC prefix: 'emr-stream-demo'
 Instance Type: 't3.small'
 ```
-2. [Attach the IAM role that contains `Cloud9Admin` to your IDE](https://www.eksworkshop.com/020_prerequisites/ec2instance/). 
+2. [Attach the `Cloud9Admin` IAM role to your Cloud9 IDE](https://www.eksworkshop.com/020_prerequisites/ec2instance/). 
 
-3. Turn off AWS managed temporary credentials in Cloud9:
+3. Run the command to turn off the AWS managed temporary credentials in Cloud9:
 ```bash
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -88,7 +91,7 @@ sudo ./aws/install --update
 rm -vf ${HOME}/.aws/credentials
 ```
 
-4. Run the script to configure the cloud9 IDE environment:
+4. Setup the connection to MSK & EKS in Cloud9:
 ```bash
 curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/workshop/deployment/app_code/post-deployment.sh | bash
 ```
@@ -98,7 +101,7 @@ curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/workshop/de
 wget https://github.com/xuite627/workshop_flink1015-1/raw/master/dataset/nycTaxiRides.gz
 zcat nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.8.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.2"  > /dev/null
 ```
-6. Launching the 3rd termnial window and monitor the source MSK topic:
+6. Launching the 2nd termnial window and monitor the source MSK topic in Cloud9:
 ```bash
 kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \

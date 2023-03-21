@@ -1,7 +1,7 @@
 # // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 from constructs import Construct
-from aws_cdk import (RemovalPolicy, aws_s3 as s3,aws_s3_deployment as s3deploy)
+from aws_cdk import (RemovalPolicy, aws_s3 as s3,aws_s3_deployment as s3deploy, Aws)
 import os
 
 class S3AppCodeConst(Construct):
