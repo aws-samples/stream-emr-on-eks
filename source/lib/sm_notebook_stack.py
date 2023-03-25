@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 #
 from constructs import Construct
-from aws_cdk import (Fn,Aws,NestedStack,RemovalPolicy,aws_sagemaker as sm)
+from aws_cdk import (Fn,Aws,CfnParameter,NestedStack,RemovalPolicy,aws_sagemaker as sm)
 from aws_cdk.aws_iam import IRole 
 from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port,Peer)
 
@@ -11,25 +11,42 @@ class NotebookStack(NestedStack):
     def __init__(self, scope: Construct, id: str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        # setup env variables
-        my_on_create_script = """
+        # Download the IPython Notebook from the workshop asset S3 bucket
+        assets_s3_param = CfnParameter(self,'WorkshopAssetsBucketName', 
+            type="String", 
+            description="workshop studio assets bucket name",
+            default=""
+        ).value_as_string
+
+        # setup env and download example notebook
+        onStartScript=f"""
         #!/bin/bash
         set -ex
+        sudo -u ec2-user -i <<'EOF'
 
         export clusterid=$(aws emr list-clusters --active  --query 'Clusters[?Name==`emr-roadshow`].Id' --output text)
         export engineer_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`engineer`)].Arn' --output text)
         export analyst_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`analyst`)].Arn' --output text)
 
-        echo "export CLUSTERID=${clusterid}" | tee -a ~/.bashrc
-        echo "export ENGINEER_ROLE=${engineer_role_arn}" | tee -a ~/.bashrc
-        echo "export ANALYST_ROLE=${analyst_role_arn}" | tee -a ~/.bashrc
+        echo "export CLUSTERID=$clusterid" | tee -a ~/.bashrc
+        echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bashrc
+        echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bashrc
         source ~/.bashrc
+
+        mkdir -p /home/ec2-user/SageMaker
+
+        BUCKET_EXISTS=$(aws s3api head-bucket --bucket{assets_s3_param} 2>&1 || true)
+        if [ -z "$BUCKET_EXISTS" ]; then
+            aws s3 cp s3://{assets_s3_param}/ /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
+        else
+            echo "Bucket does not exist"
+        fi
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",
             notebook_instance_lifecycle_config_name="sparkmagic-config",
             on_create=[sm.CfnNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleHookProperty(
-                content=Fn.base64(my_on_create_script)
+                content=Fn.base64(onStartScript)
             )])
         sm_sg=SecurityGroup.from_security_group_id(self, "notebook_sg", eksvpc.vpc_default_security_group,mutable=False)
         sm_notebook=sm.CfnNotebookInstance(self, "notebook", 
@@ -42,6 +59,8 @@ class NotebookStack(NestedStack):
             volume_size_in_gb = 10,
             lifecycle_config_name="sparkmagic-config"
         )
+        sm_notebook.add_dependency(sparkmagic_conf)
+
         # Allow Sagemaker notebook access Livy in EMR  
         self.emr_master_sg=SecurityGroup.from_security_group_id(self,"AdditionalSG",livy_sg)
         self.emr_master_sg.connections.allow_from(sm_sg, Port.tcp(8998), "open Livy port to SM")

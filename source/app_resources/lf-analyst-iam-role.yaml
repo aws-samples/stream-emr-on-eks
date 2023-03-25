@@ -8,7 +8,7 @@
   - glue:GetDatabases
   - glue:GetPartitions
   - glue:GetPartition
-  # - glue:CreateDatabase
+  - glue:CreateDatabase
   - lakeformation:GetResourceLFTags
   - lakeformation:ListLFTags
   - lakeformation:GetLFTag

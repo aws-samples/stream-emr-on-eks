@@ -187,7 +187,7 @@ class EMREC2Stack(NestedStack):
             steps=[CfnCluster.StepConfigProperty(
                 hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                     jar="command-runner.jar",
-                    args=["hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
+                    args=["bash", "-c", "hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
                 ),
                 name="cpHudiLib",
                 action_on_failure="CANCEL_AND_WAIT"
