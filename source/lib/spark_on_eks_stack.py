@@ -50,7 +50,7 @@ class SparkOnEksStack(Stack):
 
         self.assets_s3_param = CfnParameter(self,'WorkshopAssetsBucketName', 
             description="workshop studio assets bucket name",
-            # default=""
+            default=""
         ).value_as_string
 
         # 2. EKS base infra
