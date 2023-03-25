@@ -39,8 +39,8 @@ class SparkOnEksStack(Stack):
         return self.iam.lf_sagemaker_role   
 
     @property
-    def assetS3(self):
-        return self.assets_s3_param     
+    def assetURL(self):
+        return self.assets_url_param     
 
     def __init__(self, scope: Construct, id: str, eksname: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -48,7 +48,7 @@ class SparkOnEksStack(Stack):
         # 1. a new bucket to store application code
         self.app_s3 = S3AppCodeConst(self,'appcode')
 
-        self.assets_s3_param = CfnParameter(self,'WorkshopAssetsBucketName', 
+        self.assets_url_param = CfnParameter(self,'WorkshopAssetsURL', 
             description="workshop studio assets bucket name",
             default=""
         ).value_as_string
