@@ -1,7 +1,7 @@
 # // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 
-from aws_cdk import Stack
+from aws_cdk import Stack,CfnParameter
 from constructs import Construct
 from lib.cdk_infra.network_sg import NetworkSgConst
 from lib.cdk_infra.iam_roles import IamConst
@@ -36,14 +36,22 @@ class SparkOnEksStack(Stack):
 
     @property
     def LFSagemakerRole(self):
-        return self.iam.lf_sagemaker_role     
-        
-        
+        return self.iam.lf_sagemaker_role   
+
+    @property
+    def assetS3(self):
+        return self.assets_s3_param     
+
     def __init__(self, scope: Construct, id: str, eksname: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # 1. a new bucket to store application code
         self.app_s3 = S3AppCodeConst(self,'appcode')
+
+        self.assets_s3_param = CfnParameter(self,'WorkshopAssetsBucketName', 
+            description="workshop studio assets bucket name",
+            # default=""
+        ).value_as_string
 
         # 2. EKS base infra
         self.network_sg = NetworkSgConst(self,'network-sg', eksname)

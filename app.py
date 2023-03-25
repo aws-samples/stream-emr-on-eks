@@ -19,7 +19,7 @@ msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
 # 2.setup EMR on EC2
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole)
 # 3.setup Sagemaker notebook
-sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole)
+sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole, eks_stack.assetS3)
 # 4.setup Lakeformation
 lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole)
 

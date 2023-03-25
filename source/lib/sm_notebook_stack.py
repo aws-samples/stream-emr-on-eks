@@ -2,22 +2,16 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 #
 from constructs import Construct
-from aws_cdk import (Fn,Aws,CfnParameter,NestedStack,RemovalPolicy,aws_sagemaker as sm)
+from aws_cdk import (Fn,NestedStack,aws_sagemaker as sm)
 from aws_cdk.aws_iam import IRole 
-from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port,Peer)
+from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port)
 
 class NotebookStack(NestedStack):
 
-    def __init__(self, scope: Construct, id: str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, asset_s3:str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Download the IPython Notebook from the workshop asset S3 bucket
-        assets_s3_param = CfnParameter(self,'WorkshopAssetsBucketName', 
-            type="String", 
-            description="workshop studio assets bucket name",
-            default=""
-        ).value_as_string
-
         # setup env and download example notebook
         onStartScript=f"""
         #!/bin/bash
@@ -28,16 +22,14 @@ class NotebookStack(NestedStack):
         export engineer_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`engineer`)].Arn' --output text)
         export analyst_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`analyst`)].Arn' --output text)
 
-        echo "export CLUSTERID=$clusterid" | tee -a ~/.bashrc
-        echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bashrc
-        echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bashrc
-        source ~/.bashrc
+        echo "export CLUSTERID=$clusterid" | tee -a ~/.bash_profile
+        echo "export ENGINEER_ROLE=$engineer_role_arn" | tee ~/.bash_profile
+        echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
+        # source ~/.bash_profile
 
-        mkdir -p /home/ec2-user/SageMaker
-
-        BUCKET_EXISTS=$(aws s3api head-bucket --bucket{assets_s3_param} 2>&1 || true)
+        BUCKET_EXISTS=$(aws s3api head-bucket --bucket{asset_s3} 2>&1 || true)
         if [ -z "$BUCKET_EXISTS" ]; then
-            aws s3 cp s3://{assets_s3_param}/ /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
+            aws s3 cp s3://{asset_s3}/ /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
             echo "Bucket does not exist"
         fi
