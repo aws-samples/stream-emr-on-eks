@@ -30,7 +30,7 @@ class NotebookStack(NestedStack):
         S3_bucket=$(echo {asset_url} | cut -d'/' -f 3)
         BUCKET_EXISTS=$(aws s3api head-bucket --bucket $S3_bucket 2>&1 || true)
         if [ -z "$BUCKET_EXISTS" ]; then
-            aws s3 cp {asset_url}/ /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
+            aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
             echo "Bucket does not exist"
         fi

@@ -49,7 +49,7 @@ class SparkOnEksStack(Stack):
         self.app_s3 = S3AppCodeConst(self,'appcode')
 
         self.assets_url_param = CfnParameter(self,'WorkshopAssetsURL', 
-            description="workshop studio assets bucket name",
+            description="workshop studio assets bucket and prefix",
             default=""
         ).value_as_string
 
