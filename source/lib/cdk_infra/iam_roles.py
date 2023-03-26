@@ -145,7 +145,7 @@ class IamConst(Construct):
             fields= {
                 "{{AccountID}}": Aws.ACCOUNT_ID,
                 "{{AssetsBucket}}": assetS3,
-                "{{AssetsURL}}": assetURL
+                "{{AssetsURL}}": Fn.select(1,Fn.split('//',assetURL))
             })
         for statmnt in _sm_iam:
             self._sm_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
