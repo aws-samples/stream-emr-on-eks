@@ -8,12 +8,12 @@ from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port)
 
 class NotebookStack(NestedStack):
 
-    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, asset_url:str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, asset_url:str, asset_s3:str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Download the IPython Notebook from the workshop asset S3 bucket
         # setup env and download example notebook
-        onStartScript=f"""
+        onCreateScript=f"""
         #!/bin/bash
         set -ex
         sudo -u ec2-user -i <<'EOF'
@@ -25,10 +25,11 @@ class NotebookStack(NestedStack):
         echo "export CLUSTERID=$clusterid" | tee -a ~/.bash_profile
         echo "export ENGINEER_ROLE=$engineer_role_arn" | tee ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
-        # source ~/.bash_profile
+        source ~/.bash_profile
 
-        S3_bucket=$(echo {asset_url} | cut -d'/' -f 3)
-        BUCKET_EXISTS=$(aws s3api head-bucket --bucket $S3_bucket 2>&1 || true)
+        BUCKET_EXISTS=$(aws s3api head-bucket --bucket {asset_s3} 2>&1 || true)
+        echo {asset_s3}
+        echo $BUCKET_EXISTS
         if [ -z "$BUCKET_EXISTS" ]; then
             aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
@@ -39,7 +40,7 @@ class NotebookStack(NestedStack):
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",
             notebook_instance_lifecycle_config_name="sparkmagic-config",
             on_create=[sm.CfnNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleHookProperty(
-                content=Fn.base64(onStartScript)
+                content=Fn.base64(onCreateScript)
             )])
         sm_sg=SecurityGroup.from_security_group_id(self, "notebook_sg", eksvpc.vpc_default_security_group,mutable=False)
         sm_notebook=sm.CfnNotebookInstance(self, "notebook", 
