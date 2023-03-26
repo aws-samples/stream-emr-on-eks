@@ -21,9 +21,9 @@ class MSKStack(NestedStack):
     def Cloud9URL(self):
         return self._c9env.ref
 
-    # @property
-    # def MSKBroker(self):
-    #     return self._msk_cluster.bootstrap_brokers
+    @property
+    def MSKBroker(self):
+        return self._msk_cluster.bootstrap_brokers
 
 
     def __init__(self, scope: Construct, id: str, cluster_name:str, eksvpc: ec2.IVpc, **kwargs) -> None:
@@ -73,4 +73,3 @@ class MSKStack(NestedStack):
             self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.tcp(9094), "Zookeeper Plaintext")
         for subnet in eksvpc.private_subnets:
             self._msk_cluster.connections.allow_from(ec2.Peer.ipv4(subnet.ipv4_cidr_block), ec2.Port.all_traffic(), "All private traffic")
-   

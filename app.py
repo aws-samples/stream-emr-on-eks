@@ -25,7 +25,7 @@ lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole)
 
 
 Tags.of(eks_stack).add('project', proj_name)
-# Tags.of(msk_stack).add('project', proj_name)
+Tags.of(msk_stack).add('project', proj_name)
 Tags.of(emr_ec2_stack).add('for-use-with-amazon-emr-managed-policies', 'true')
 
 # Deployment Output
@@ -35,7 +35,7 @@ CfnOutput(eks_stack,"MSK_CLIENT_URL",
     description="Cloud9 Url, Use this URL to access your command line environment in a browser"
 )
 
-# CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
+CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
 CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)
 
