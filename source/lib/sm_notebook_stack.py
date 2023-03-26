@@ -28,12 +28,11 @@ class NotebookStack(NestedStack):
         source ~/.bash_profile
 
         BUCKET_EXISTS=$(aws s3api head-bucket --bucket {asset_s3} 2>&1 || true)
-        echo {asset_s3}
-        echo $BUCKET_EXISTS
         if [ -z "$BUCKET_EXISTS" ]; then
             aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
-            echo "Bucket does not exist"
+            echo "Bucket does not exist, download from github"
+            curl -o /home/ec2-user/SageMaker/emr-lab.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/main/deployment/app_code/job/*lab*.ipynb
         fi
         """
 
