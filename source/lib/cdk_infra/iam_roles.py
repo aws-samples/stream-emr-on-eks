@@ -144,6 +144,7 @@ class IamConst(Construct):
         _sm_iam = load_yaml_replace_var_local(source_dir+'/app_resources/lf-sagemaker-role.yaml', 
             fields= {
                 "{{AccountID}}": Aws.ACCOUNT_ID,
+                "{{REGION}}": Aws.REGION,
                 "{{AssetsBucket}}": assetS3,
                 "{{AssetsURL}}": Fn.select(1,Fn.split('//',assetURL))
             })

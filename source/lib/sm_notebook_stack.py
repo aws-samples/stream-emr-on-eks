@@ -18,21 +18,22 @@ class NotebookStack(NestedStack):
         set -ex
         sudo -u ec2-user -i <<'EOF'
 
-        export clusterid=$(aws emr list-clusters --active  --query 'Clusters[?Name==`emr-roadshow`].Id' --output text)
+        export region=$(aws configure list | grep region | tr -s ' ' | cut -d" " -f3)
+        export account_id=$(aws sts get-caller-identity --output text --query Account)
+        export datalake_bucket=lf-datalake-$account_id-$region
         export engineer_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`engineer`)].Arn' --output text)
         export analyst_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`analyst`)].Arn' --output text)
-
-        echo "export CLUSTERID=$clusterid" | tee -a ~/.bash_profile
+        
+        echo "export DATALAKE_BUCKET=$datalake_bucket" | tee ~/.bash_profile
         echo "export ENGINEER_ROLE=$engineer_role_arn" | tee ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
-        source ~/.bash_profile
-
+        
         BUCKET_EXISTS=$(aws s3api head-bucket --bucket {asset_s3} 2>&1 || true)
         if [ -z "$BUCKET_EXISTS" ]; then
             aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
             echo "Bucket does not exist, download from github"
-            curl -o /home/ec2-user/SageMaker/emr-lab.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/main/deployment/app_code/job/*lab*.ipynb
+            curl -o /home/ec2-user/SageMaker/emr-lab.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
         fi
         """
 
