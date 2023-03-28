@@ -4,6 +4,17 @@
   - kafka:DescribeCluster
   - kafka:UpdateClusterConfiguration
   - eks:Describe*
+  - eks:List*
+  - eks:AccessKubernetesApi
+  - eks:CreateAddon
+  - eks:CreateCluster
+  - eks:CreateFargateProfile
+  - eks:CreateNodegroup
+  - eks:DeleteAddon
+  - eks:DeleteCluster
+  - eks:DeleteFargateProfile
+  - eks:DeleteNodegroup
+  - eks:TagResource
   - s3:List*
   - s3:GetObject
   - elasticmapreduce:ListClusters
@@ -44,5 +55,19 @@
       elasticmapreduce:ExecutionRoleArn:
       - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
       - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+  Resource: 
+    - "*"
+- Effect: Allow
+  Action:
+  - ecr-public:GetAuthorizationToken
+  - sts:GetServiceBearerToken
+  - ecr-public:BatchCheckLayerAvailability
+  - ecr-public:GetRepositoryPolicy
+  - ecr-public:DescribeRepositories
+  - ecr-public:DescribeRegistries
+  - ecr-public:DescribeImages
+  - ecr-public:DescribeImageTags
+  - ecr-public:GetRepositoryCatalogData
+  - ecr-public:GetRegistryCatalogData
   Resource: 
     - "*"

@@ -3,8 +3,9 @@
 
 from constructs import Construct
 from aws_cdk import (aws_eks as eks, aws_ec2 as ec2)
-from aws_cdk.aws_iam import IRole
+from aws_cdk.aws_iam import IRole, Role
 from aws_cdk.lambda_layer_kubectl_v24 import KubectlV24Layer
+import boto3
 
 class EksConst(Construct):
 
@@ -23,6 +24,7 @@ class EksConst(Construct):
         eks_adminrole: IRole, 
         emr_svc_role: IRole, 
         fg_pod_role: IRole, 
+        cloud9_ec2_role: IRole,
         **kwargs
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -81,5 +83,10 @@ class EksConst(Construct):
 
         # # 6. Allow EKS access from Cloud9      
         self._my_cluster.cluster_security_group.add_ingress_rule(ec2.Peer.ipv4(eksvpc.vpc_cidr_block),ec2.Port.all_tcp())
+        self._my_cluster.aws_auth.add_role_mapping(cloud9_ec2_role, groups=["system:masters"],username="cloud9Admin")
 
-        
+        # 7. add the current login user / role to aws-auth
+        sts_client = boto3.client("sts")
+        response = sts_client.get_caller_identity()
+        _current_role = Role.from_role_arn(self,"current_role",role_arn=response['Arn'])
+        self._my_cluster.aws_auth.add_role_mapping(_current_role, groups=["system:masters"],username="lab_participant")

@@ -61,9 +61,9 @@ class SparkOnEksStack(Stack):
         # 2. EKS base infra
         self.network_sg = NetworkSgConst(self,'network-sg', eksname)
         self.iam = IamConst(self,'iam_roles', eksname, self.assets_url_param, self.assets_s3_bucket)
-        self.eks_cluster = EksConst(self,'eks_cluster', eksname, self.network_sg.vpc, self.iam.managed_node_role, self.iam.admin_role, self.iam.emr_svc_role, self.iam.fg_pod_role)
+        self.eks_cluster = EksConst(self,'eks_cluster', eksname, self.network_sg.vpc, self.iam.managed_node_role, self.iam.admin_role, self.iam.emr_svc_role, self.iam.fg_pod_role, self.iam.cloud9_ec2_role)
         EksSAConst(self, 'eks_service_account', self.eks_cluster.my_cluster)
         EksBaseAppConst(self, 'eks_base_app', self.eks_cluster.my_cluster)
 
         # 3. Setup Spark environment, Register for EMR on EKS
-        self.emr = SparkOnEksConst(self,'spark_permission',self.eks_cluster.my_cluster, self.app_s3.code_bucket, self.eks_cluster.awsAuth)
+        self.emr = SparkOnEksConst(self,'spark_permission',self.eks_cluster.my_cluster, self.app_s3.code_bucket)

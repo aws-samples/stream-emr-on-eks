@@ -12,7 +12,7 @@
 ######################################################################################################################
 from constructs import Construct
 from aws_cdk import (CfnJson, Aws, aws_iam as iam,aws_emrcontainers as emrc)
-from aws_cdk.aws_eks import ICluster, KubernetesManifest, AwsAuth
+from aws_cdk.aws_eks import ICluster, KubernetesManifest
 from lib.util.manifest_reader import load_yaml_replace_var_local
 import os
 
@@ -28,8 +28,7 @@ class SparkOnEksConst(Construct):
 
     def __init__(self,scope: Construct, id: str, 
         eks_cluster: ICluster, 
-        code_bucket: str, 
-        awsAuth: AwsAuth,
+        code_bucket: str,
         **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 

@@ -31,6 +31,10 @@ class IamConst(Construct):
     @property
     def lf_sagemaker_role(self):
         return self._sm_role 
+
+    @property
+    def cloud9_ec2_role(self):
+        return self._cloud9_role    
        
 
     def __init__(self,scope: Construct, id:str, cluster_name:str, assetURL:str, assetS3:str, **kwargs,) -> None:
