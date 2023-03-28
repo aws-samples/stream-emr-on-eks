@@ -18,7 +18,7 @@ class NotebookStack(NestedStack):
         set -ex
         sudo -u ec2-user -i <<'EOF'
 
-        export region=$(aws configure list | grep region | tr -s ' ' | cut -d" " -f3)
+        export region=$(aws configure get region)
         export account_id=$(aws sts get-caller-identity --output text --query Account)
         export datalake_bucket=lf-datalake-$account_id-$region
         export engineer_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`engineer`)].Arn' --output text)
@@ -35,6 +35,7 @@ class NotebookStack(NestedStack):
             echo "Bucket does not exist, download from github"
             curl -o /home/ec2-user/SageMaker/emr-lab.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
         fi
+        pip install sagemaker-studio-analytics-extension
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",

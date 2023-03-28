@@ -184,13 +184,22 @@ class EMREC2Stack(NestedStack):
                     args=[_efs.file_system_id, Aws.REGION]
                 )
             )],
-            steps=[CfnCluster.StepConfigProperty(
-                hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
-                    jar="command-runner.jar",
-                    args=["bash", "-c", "hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
-                ),
-                name="cpHudiLib",
-                action_on_failure="CANCEL_AND_WAIT"
+            steps=[
+                CfnCluster.StepConfigProperty(
+                    name="cpHudiLib",
+                    action_on_failure="CANCEL_AND_WAIT",
+                    hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
+                        jar="command-runner.jar",
+                        args=["bash", "-c", f"hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
+                    )
+                 ),
+                CfnCluster.StepConfigProperty(
+                    name="copyS3data",
+                    action_on_failure="CANCEL_AND_WAIT",
+                    hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
+                        jar="command-runner.jar",
+                        args=["s3-dist-cp","--src","s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist/","--dest",f"s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist/","--s3Endpoint","s3.us-west-2.amazonaws.com","--src-pattern", "'^.*$|head -n 10000'"]
+                    )
             )]
         )
         emr_c.add_dependency(emr_job_flow_profile)
