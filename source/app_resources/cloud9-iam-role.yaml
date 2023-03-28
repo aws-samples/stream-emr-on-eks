@@ -19,7 +19,12 @@
   - s3:GetObject
   - elasticmapreduce:ListClusters
   - elasticmapreduce:DescribeCluster
-  - elasticmapreduce:AddJobFlowSteps
+  - elasticmapreduce:AddJobFlowSteps,
+  - aps:*
+  - secretsmanager:GetResourcePolicy
+  - secretsmanager:GetSecretValue
+  - secretsmanager:DescribeSecret
+  - secretsmanager:ListSecretVersionIds
   Resource: 
     - "*"
 - Effect: Allow
