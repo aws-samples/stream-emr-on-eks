@@ -186,19 +186,19 @@ class EMREC2Stack(NestedStack):
             )],
             steps=[
                 CfnCluster.StepConfigProperty(
-                    name="cpHudiLib",
+                    name="cpSrcDatatoCodeBucket",
                     action_on_failure="CANCEL_AND_WAIT",
                     hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                         jar="command-runner.jar",
-                        args=["bash", "-c", f"hdfs dfs -mkdir -p /apps/hudi/lib && hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar"]
+                        args=["bash", "-c", f"aws s3 sync sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://{code_bucket}/data/ticket_purchase_hist"]
                     )
                  ),
                 CfnCluster.StepConfigProperty(
-                    name="copyS3data",
+                    name="cpSrcDatatoLFBucket",
                     action_on_failure="CANCEL_AND_WAIT",
                     hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                         jar="command-runner.jar",
-                        args=["s3-dist-cp","--src","s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist/","--dest",f"s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist/","--s3Endpoint","s3.us-west-2.amazonaws.com"]
+                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist"]
                     )
             )]
         )

@@ -4,13 +4,15 @@
     Resource:
     - arn:aws:s3:::{{codeBucket}}
     - arn:aws:s3:::aws-dataengineering-day.workshop.aws
+    - arn:aws:s3:::lf-datalake-{{AccountID}}-{{REGION}}
   - Effect: Allow
     Action:
     - s3:PutObject
     - s3:GetObject
     Resource:
     - arn:aws:s3:::{{codeBucket}}/*
-    - arn:aws:s3:::aws-dataengineering-day.workshop.aws/data/dms_sample/*
+    - arn:aws:s3:::aws-dataengineering-day.workshop.aws/*
+    - arn:aws:s3:::lf-datalake-{{AccountID}}-{{REGION}}/*
   - Effect: Allow
     Action:
     - s3:DeleteObject

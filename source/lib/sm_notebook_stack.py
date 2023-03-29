@@ -24,8 +24,8 @@ class NotebookStack(NestedStack):
         export engineer_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`engineer`)].Arn' --output text)
         export analyst_role_arn=$(aws iam list-roles --query 'Roles[?contains(RoleName,`analyst`)].Arn' --output text)
         
-        echo "export DATALAKE_BUCKET=$datalake_bucket" | tee ~/.bash_profile
-        echo "export ENGINEER_ROLE=$engineer_role_arn" | tee ~/.bash_profile
+        echo "export DATALAKE_BUCKET=$datalake_bucket" | tee -a ~/.bash_profile
+        echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
         
         BUCKET_EXISTS=$(aws s3api head-bucket --bucket {asset_s3} 2>&1 || true)
@@ -35,7 +35,6 @@ class NotebookStack(NestedStack):
             echo "Bucket does not exist, download from github"
             curl -o /home/ec2-user/SageMaker/EMR-lab-fine-grained-access-control.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
         fi
-        pip install sagemaker-studio-analytics-extension
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",
