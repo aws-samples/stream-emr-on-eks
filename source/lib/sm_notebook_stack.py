@@ -33,7 +33,7 @@ class NotebookStack(NestedStack):
             aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
         else
             echo "Bucket does not exist, download from github"
-            curl -o /home/ec2-user/SageMaker/emr-lab.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
+            curl -o /home/ec2-user/SageMaker/EMR-lab-fine-grained-access-control.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
         fi
         pip install sagemaker-studio-analytics-extension
         """
