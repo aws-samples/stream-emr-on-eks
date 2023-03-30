@@ -186,20 +186,12 @@ class EMREC2Stack(NestedStack):
             )],
             steps=[
                 CfnCluster.StepConfigProperty(
-                    name="cpSrcDatatoCodeBucket",
+                    name="cpSrcDatato2Buckets",
                     action_on_failure="CANCEL_AND_WAIT",
                     hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                         jar="command-runner.jar",
-                        args=["bash", "-c", f"aws s3 sync sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://{code_bucket}/data/ticket_purchase_hist"]
+                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist && aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample s3://{code_bucket}/data"]
                     )
-                 ),
-                CfnCluster.StepConfigProperty(
-                    name="cpSrcDatatoLFBucket",
-                    action_on_failure="CANCEL_AND_WAIT",
-                    hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
-                        jar="command-runner.jar",
-                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist"]
-                    )
-            )]
+                 )]
         )
         emr_c.add_dependency(emr_job_flow_profile)
