@@ -25,6 +25,19 @@
   - secretsmanager:GetSecretValue
   - secretsmanager:DescribeSecret
   - secretsmanager:ListSecretVersionIds
+  - ec2:Describe*
+  - ec2:Get*
+  - iam:Get*
+  - iam:List*
+  - iam:CreatePolicy
+  - iam:CreateRole
+  - iam:TagPolicy
+  - iam:TagRole
+  - events:TagResource
+  - events:PutRule
+  - events:List*
+  - events:DescribeRule
+  - emr-containers:TagResource
   Resource: 
     - "*"
 - Effect: Allow
