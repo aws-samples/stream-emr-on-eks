@@ -1,69 +1,64 @@
 - Effect: Allow
   Action:
   - ssm:GetParameter
-  - kafka:DescribeCluster
-  - kafka:UpdateClusterConfiguration
-  - eks:Describe*
-  - eks:List*
-  - eks:AccessKubernetesApi
-  - eks:CreateAddon
-  - eks:CreateCluster
-  - eks:CreateFargateProfile
-  - eks:CreateNodegroup
-  - eks:DeleteAddon
-  - eks:DeleteCluster
-  - eks:DeleteFargateProfile
-  - eks:DeleteNodegroup
-  - eks:TagResource
-  - s3:List*
-  - s3:GetObject
+  - eks:*
+  - s3:*
   - elasticmapreduce:ListClusters
   - elasticmapreduce:DescribeCluster
   - elasticmapreduce:AddJobFlowSteps
   - aps:*
-  - secretsmanager:GetResourcePolicy
-  - secretsmanager:GetSecretValue
-  - secretsmanager:DescribeSecret
-  - secretsmanager:ListSecretVersionIds
+  - sqs:*
+  - events:*
+  - secretsmanager:*
   - ec2:Describe*
   - ec2:Get*
   - iam:Get*
   - iam:List*
+  - iam:Tag*
+  - iam:Delete*
   - iam:CreatePolicy
   - iam:CreateRole
-  - iam:TagPolicy
-  - iam:TagRole
-  - events:TagResource
-  - events:PutRule
-  - events:List*
-  - events:DescribeRule
-  - emr-containers:TagResource
+  - iam:CreateInstanceProfile
+  - iam:AttachRolePolicy
+  - iam:AddRoleToInstanceProfile
+  - iam:RemoveRoleFromInstanceProfile
+  - iam:DetachRolePolicy
   Resource: 
     - "*"
 - Effect: Allow
   Action:
-  - kafka:ListClusters
-  - kafka:ListClustersV2
+  - kafka:DescribeCluster
+  - kafka:UpdateClusterConfiguration
+  - kafka:List*
   - kafka:CreateConfiguration
-  - kafka:ListConfigurations
   Resource:
-  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/v1/clusters
-  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/api/v2/clusters
-  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/v1/configurations
+  - arn:aws:kafka:{{REGION}}:{{AccountID}}:/*
 - Effect: Allow
   Action:
   - emr-containers:StartJobRun
+  - emr-containers:List*
+  - emr-containers:Describe*
+  - emr-containers:DeleteVirtualCluster
+  - emr-containers:CancelJobRun
   Resource: 
   - arn:aws:emr-containers:{{REGION}}:{{AccountID}}:/virtualclusters/*
+- Effect: Allow
+  Action:
+  - emr-containers:TagResource
+  - emr-containers:CreateVirtualCluster
+  Resource: 
+  - arn:aws:emr-containers:{{REGION}}:{{AccountID}}:/*
 - Effect: Allow
   Sid: AllowPassRoleSageMaker
   Action:
   - iam:GetRole
   - iam:PassRole
-  - iam:GetRole
   Resource:
   - arn:aws:iam::{{AccountID}}:role/lf-data-access-engineer
   - arn:aws:iam::{{AccountID}}:role/lf-data-access-analyst
+  - arn:aws:iam::{{AccountID}}:role/*-vpc-cni
+  - arn:aws:iam::{{AccountID}}:role/*-ebs-csi-driver
+  - arn:aws:iam::{{AccountID}}:role/Karpenter-*-*
 - Effect: Allow
   Sid: AllowClusterCreds
   Action:
@@ -89,3 +84,8 @@
   - ecr-public:GetRegistryCatalogData
   Resource: 
     - "*"
+- Effect: Allow
+  Action:    
+  - logs:*
+  Resource:
+  - arn:aws:logs:*:*:*
