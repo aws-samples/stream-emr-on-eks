@@ -85,8 +85,24 @@ class EksConst(Construct):
         self._my_cluster.cluster_security_group.add_ingress_rule(ec2.Peer.ipv4(eksvpc.vpc_cidr_block),ec2.Port.all_tcp())
         self._my_cluster.aws_auth.add_role_mapping(cloud9_ec2_role, groups=["system:masters"],username="cloud9Admin")
 
-        # 7. add the current login user / role to aws-auth
-        sts_client = boto3.client("sts")
-        response = sts_client.get_caller_identity()
-        _current_role = Role.from_role_arn(self,"current_role",role_arn=response['Arn'])
-        self._my_cluster.aws_auth.add_role_mapping(_current_role, groups=["system:masters"],username="lab_participant")
+        # 7. add the current login user / lab role to aws-auth
+        iam_client = boto3.client("iam")
+        try:
+            iam_client.get_role(RoleName='WSParticipantRole')
+            _current_role = Role.from_role_arn(self,
+                "participant_role",
+                role_arn=f"arn:aws:sts::{Aws.ACCOUNT_ID}:assumed-role/WSParticipantRole/Participant"
+            )
+        except iam_client.exceptions.NoSuchEntityException:
+            sts_client = boto3.client("sts")
+            response = sts_client.get_caller_identity()
+            _current_role = Role.from_role_arn(self,
+                "current_user",
+                role_arn=response['Arn']
+            )
+        finally:
+           self._my_cluster.aws_auth.add_role_mapping(
+                _current_role, 
+                groups=["system:masters"],
+                username="current_user"
+           )

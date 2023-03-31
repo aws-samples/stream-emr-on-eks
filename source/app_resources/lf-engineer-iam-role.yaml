@@ -12,6 +12,7 @@
   - glue:GetUserDefinedFunctions
   - glue:CreateTable
   - glue:UpdateTable
+  - glue:DeleteTable
   - lakeformation:GetResourceLFTags
   - lakeformation:ListLFTags
   - lakeformation:GetLFTag
