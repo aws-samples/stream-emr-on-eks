@@ -156,4 +156,35 @@ class IamConst(Construct):
             self._sm_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
         )
         self._sm_role.apply_removal_policy(RemovalPolicy.DESTROY)
+
+        self.emr_serverless_job_role = iam.Role(self,'EMRServerlessRuntimeRole',
+                                                assumed_by=iam.ServicePrincipal('emr-serverless.amazonaws.com')
+                                                )
+        self.emr_serverless_job_role.add_to_policy(iam.PolicyStatement(
+            resources=["*"],
+            actions=[
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+        ))
+        self.emr_serverless_job_role.add_to_policy(iam.PolicyStatement(
+            resources=["*"],
+            actions=[
+                "glue:GetDatabase",
+                "glue:CreateDatabase",
+                "glue:GetDataBases",
+                "glue:CreateTable",
+                "glue:GetTable",
+                "glue:UpdateTable",
+                "glue:DeleteTable",
+                "glue:GetTables",
+                "glue:GetPartition",
+                "glue:GetPartitions",
+                "glue:CreatePartition",
+                "glue:BatchCreatePartition",
+                "glue:GetUserDefinedFunctions"
+            ],
+        ))
         
