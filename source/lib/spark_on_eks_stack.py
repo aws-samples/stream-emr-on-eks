@@ -32,7 +32,11 @@ class SparkOnEksStack(Stack):
 
     @property
     def LFEngineerRole(self):
-        return self.iam.lf_engineer_role       
+        return self.iam.lf_engineer_role  
+
+    @property
+    def LFAnalystRole(self):
+        return self.iam.lf_analyst_role  
 
     @property
     def LFSagemakerRole(self):

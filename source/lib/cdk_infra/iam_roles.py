@@ -29,6 +29,10 @@ class IamConst(Construct):
         return self._engineer_role
 
     @property
+    def lf_analyst_role(self):
+        return self._analyst_role
+
+    @property
     def lf_sagemaker_role(self):
         return self._sm_role 
 

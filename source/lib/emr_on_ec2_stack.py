@@ -13,7 +13,7 @@ class EMREC2Stack(NestedStack):
         return self._instances.additional_master_security_groups[0]
 
 
-    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, engineer_role: iam.IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, engineer_role: iam.IRole, analyst_role: iam.IRole, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
@@ -93,8 +93,8 @@ class EMREC2Stack(NestedStack):
                 "{{EmrEc2ProfileRole}}": _emr_job_role.role_arn
             })
         for statmnt in _prin_policy:
-            engineer_role.assume_role_policy.add_statements(iam.PolicyStatement.from_json(statmnt)
-        )
+            engineer_role.assume_role_policy.add_statements(iam.PolicyStatement.from_json(statmnt))
+            analyst_role.assume_role_policy.add_statements(iam.PolicyStatement.from_json(statmnt))
 
         #########################################
         #######                           #######
