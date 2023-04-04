@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 
 from constructs import Construct
-from aws_cdk import (aws_eks as eks, aws_ec2 as ec2)
+from aws_cdk import (aws_eks as eks, aws_ec2 as ec2, Aws)
 from aws_cdk.aws_iam import IRole, Role
 from aws_cdk.lambda_layer_kubectl_v24 import KubectlV24Layer
 import boto3
