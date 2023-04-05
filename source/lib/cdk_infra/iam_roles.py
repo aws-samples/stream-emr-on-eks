@@ -93,7 +93,7 @@ class IamConst(Construct):
         # Cloud9 EC2 role
         self._cloud9_role=iam.Role(self,"Cloud9Admin",
             assumed_by=iam.ServicePrincipal('ec2.amazonaws.com'),
-            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AWSCloudFormationReadOnlyAccess')]
+            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('AWSCloudFormationReadOnlyAccess')],
             description="cloud9admin"
         )
         self._cloud9_role.add_to_policy(iam.PolicyStatement(
