@@ -3,7 +3,6 @@
     - s3:ListBucket
     Resource:
     - arn:aws:s3:::{{codeBucket}}
-    - arn:aws:s3:::aws-dataengineering-day.workshop.aws
     - arn:aws:s3:::lf-datalake-{{AccountID}}-{{REGION}}
   - Effect: Allow
     Action:
@@ -11,13 +10,19 @@
     - s3:GetObject
     Resource:
     - arn:aws:s3:::{{codeBucket}}/*
-    - arn:aws:s3:::aws-dataengineering-day.workshop.aws/*
     - arn:aws:s3:::lf-datalake-{{AccountID}}-{{REGION}}/*
   - Effect: Allow
     Action:
     - s3:DeleteObject
     Resource:
     - arn:aws:s3:::{{codeBucket}}/*
+  - Effect: Allow
+    Action: 
+    - s3:ListBucket
+    - s3:GetObject
+    Resource:
+    - arn:aws:s3:::aws-dataengineering-day.workshop.aws/*
+    - arn:aws:s3:::aws-dataengineering-day.workshop.aws 
   - Effect: Allow
     Action:
     - kms:Encrypt

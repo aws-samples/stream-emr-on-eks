@@ -30,7 +30,7 @@ chmod +x kubectl
 mkdir -p $HOME/bin && mv kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
 
 # 2. Update MSK with custom configuration
-baes64 <<EoF >msk-config.txt
+base64 <<EoF >msk-config.txt
 auto.create.topics.enable=true
 log.retention.minutes=1440
 zookeeper.connection.timeout.ms=1000

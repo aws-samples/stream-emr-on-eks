@@ -42,13 +42,13 @@ class SparkOnEksStack(Stack):
     def LFSagemakerRole(self):
         return self.iam.lf_sagemaker_role   
 
-    @property
-    def assetURL(self):
-        return self.assets_url_param    
+    # @property
+    # def assetURL(self):
+    #     return self.assets_url_param    
 
-    @property
-    def assetS3(self):
-        return self.assets_s3_bucket
+    # @property
+    # def assetS3(self):
+    #     return self.assets_s3_bucket
 
     def __init__(self, scope: Construct, id: str, eksname: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -56,15 +56,15 @@ class SparkOnEksStack(Stack):
         # 1. a new bucket to store application code
         self.app_s3 = S3AppCodeConst(self,'appcode')
 
-        self.assets_url_param = CfnParameter(self,'WorkshopAssetsURL', 
-            description='workshop studio assets bucket and prefix',
-            default='s3://mybucket'
-        ).value_as_string
-        self.assets_s3_bucket=Fn.select(2,Fn.split('/',self.assets_url_param))
+        # self.assets_url_param = CfnParameter(self,'WorkshopAssetsURL', 
+        #     description='workshop studio assets bucket and prefix',
+        #     default='s3://mybucket'
+        # ).value_as_string
+        # self.assets_s3_bucket=Fn.select(2,Fn.split('/',self.assets_url_param))
  
         # 2. EKS base infra
         self.network_sg = NetworkSgConst(self,'network-sg', eksname)
-        self.iam = IamConst(self,'iam_roles', eksname, self.assets_url_param, self.assets_s3_bucket)
+        self.iam = IamConst(self,'iam_roles', eksname)
         self.eks_cluster = EksConst(self,'eks_cluster', eksname, self.network_sg.vpc, self.iam.managed_node_role, self.iam.admin_role, self.iam.emr_svc_role, self.iam.fg_pod_role, self.iam.cloud9_ec2_role)
         EksSAConst(self, 'eks_service_account', self.eks_cluster.my_cluster)
         EksBaseAppConst(self, 'eks_base_app', self.eks_cluster.my_cluster)

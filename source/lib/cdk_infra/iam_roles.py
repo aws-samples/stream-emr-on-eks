@@ -41,7 +41,7 @@ class IamConst(Construct):
         return self._cloud9_role    
        
 
-    def __init__(self,scope: Construct, id:str, cluster_name:str, assetURL:str, assetS3:str, **kwargs,) -> None:
+    def __init__(self,scope: Construct, id:str, cluster_name:str, **kwargs,) -> None:
         super().__init__(scope, id, **kwargs)
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
@@ -152,9 +152,7 @@ class IamConst(Construct):
         _sm_iam = load_yaml_replace_var_local(source_dir+'/app_resources/lf-sagemaker-role.yaml', 
             fields= {
                 "{{AccountID}}": Aws.ACCOUNT_ID,
-                "{{REGION}}": Aws.REGION,
-                "{{AssetsBucket}}": assetS3,
-                "{{AssetsURL}}": Fn.select(1,Fn.split('//',assetURL))
+                "{{REGION}}": Aws.REGION
             })
         for statmnt in _sm_iam:
             self._sm_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)

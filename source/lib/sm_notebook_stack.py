@@ -8,7 +8,7 @@ from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port)
 
 class NotebookStack(NestedStack):
 
-    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, asset_url:str, asset_s3:str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Download the IPython Notebook from the workshop asset S3 bucket
@@ -28,13 +28,7 @@ class NotebookStack(NestedStack):
         echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
         
-        BUCKET_EXISTS=$(aws s3api head-bucket --bucket {asset_s3} 2>&1 || true)
-        if [ -z "$BUCKET_EXISTS" ]; then
-            aws s3 cp {asset_url} /home/ec2-user/SageMaker --recursive --exclude "*" --include "*.ipynb"
-        else
-            echo "Bucket does not exist, download from github"
-            curl -o /home/ec2-user/SageMaker/EMR-lab-fine-grained-access-control.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
-        fi
+        curl -o /home/ec2-user/SageMaker/EMR-lab-fine-grained-access-control.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",

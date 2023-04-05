@@ -33,6 +33,7 @@
   - kafka:CreateConfiguration
   Resource:
   - arn:aws:kafka:{{REGION}}:{{AccountID}}:/*
+  - arn:aws:kafka:{{REGION}}:{{AccountID}}:cluster/*
 - Effect: Allow
   Action:
   - emr-containers:StartJobRun
