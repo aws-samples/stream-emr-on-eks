@@ -29,7 +29,7 @@ class LFStack(NestedStack):
         _engineer_role=lf.CfnPermissions.DataLakePrincipalProperty(
             data_lake_principal_identifier=engineer_role.role_arn
         )
-        data_location1=lf.CfnPermissions(self, "DataLocation", 
+        _data_location1=lf.CfnPermissions(self, "DataLocation", 
             data_lake_principal=_engineer_role,
             resource=lf.CfnPermissions.ResourceProperty(
                 data_location_resource=lf.CfnPermissions.DataLocationResourceProperty(
@@ -38,14 +38,14 @@ class LFStack(NestedStack):
             ),
             permissions=['DATA_LOCATION_ACCESS']
         )
-        data_location1.add_dependency(_dl_location)
+        _data_location1.add_dependency(_dl_location)
         
         # create a describe permission for analyst role to access default DB
         _analyst_principal=lf.CfnPermissions.DataLakePrincipalProperty(
                 data_lake_principal_identifier=analyst_role.role_arn
         )
         _data_location2=lf.CfnPermissions(self, "DBDataLocation", 
-            data_lake_principal=_analyst_principal
+            data_lake_principal=_analyst_principal,
             resource=lf.CfnPermissions.ResourceProperty(
                 database_resource=lf.CfnPermissions.DatabaseResourceProperty(name="default")
             ),
