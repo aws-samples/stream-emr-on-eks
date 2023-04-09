@@ -21,9 +21,9 @@ airflow_stack = AirflowStack(eks_stack, "AirflowStack", eks_stack.eksvpc, "emr-s
 # 2.setup EMR on EC2
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole)
 # 3.setup Sagemaker notebook
-sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole)
+# sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole, eks_stack.code_bucket)
 # 4.setup Lakeformation
-lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole)
+lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.LFAnalystRole)
 
 
 Tags.of(eks_stack).add('project', proj_name)
@@ -32,12 +32,12 @@ Tags.of(emr_ec2_stack).add('for-use-with-amazon-emr-managed-policies', 'true')
 
 # Deployment Output
 CfnOutput(eks_stack,'CODE_BUCKET', value=eks_stack.code_bucket)
-CfnOutput(eks_stack,"MSK_CLIENT_URL",
-    value=f"https://{Aws.REGION}.console.aws.amazon.com/cloud9/ide/{msk_stack.Cloud9URL}",
-    description="Cloud9 Url, Use this URL to access your command line environment in a browser"
-)
+# CfnOutput(eks_stack,"MSK_CLIENT_URL",
+#     value=f"https://{Aws.REGION}.console.aws.amazon.com/cloud9/ide/{msk_stack.Cloud9URL}",
+#     description="Cloud9 Url, Use this URL to access your command line environment in a browser"
+# )
 
-CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
+# CfnOutput(eks_stack, "MSK_BROKER", value=msk_stack.MSKBroker)
 CfnOutput(eks_stack, "VirtualClusterId",value=eks_stack.EMRVC)
 CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)
 

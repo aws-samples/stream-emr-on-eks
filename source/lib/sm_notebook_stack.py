@@ -8,10 +8,9 @@ from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port)
 
 class NotebookStack(NestedStack):
 
-    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, code_bucket: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        # Download the IPython Notebook from the workshop asset S3 bucket
         # setup env and download example notebook
         onCreateScript=f"""
         #!/bin/bash
@@ -28,7 +27,7 @@ class NotebookStack(NestedStack):
         echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
         
-        curl -o /home/ec2-user/SageMaker/EMR-lab-fine-grained-access-control.ipynb https://github.com/aws-samples/stream-emr-on-eks/blob/workshop/deployment/app_code/job/*lab*.ipynb
+        aws s3 cp s3://{code_bucket}/app_code/job/EMR-lab-fine-grained-access-control.ipynb /home/ec2-user/SageMaker/
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",

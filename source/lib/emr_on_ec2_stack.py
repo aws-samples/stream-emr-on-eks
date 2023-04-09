@@ -110,7 +110,7 @@ class EMREC2Stack(NestedStack):
         self._instances=CfnCluster.JobFlowInstancesConfigProperty(
             additional_master_security_groups=[_livy_sg.security_group_id],
             termination_protected=False,
-            ec2_subnet_id=eksvpc.public_subnets[0].subnet_id,
+            ec2_subnet_id=eksvpc.private_subnets[0].subnet_id,
             master_instance_group=CfnCluster.InstanceGroupConfigProperty(
                 instance_count=1, 
                 instance_type="r5.xlarge", 
