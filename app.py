@@ -7,6 +7,7 @@ from source.lib.sm_notebook_stack import NotebookStack
 from source.lib.lake_formation_stack import LFStack
 from source.lib.msk_stack import MSKStack
 from source.lib.spark_on_eks_stack import SparkOnEksStack
+from source.lib.airflow_stack import AirflowStack
 
 app = App()
 proj_name = app.node.try_get_context('project_name')
@@ -15,6 +16,7 @@ emr_release_v=app.node.try_get_context('emr_version')
 # 1.main stacks
 eks_stack = SparkOnEksStack(app, proj_name, proj_name)
 msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
+airflow_stack = AirflowStack(eks_stack, "AirflowStack", eks_stack.eksvpc, "emr-serverless-airflow")
 
 # 2.setup EMR on EC2
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole)
