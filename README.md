@@ -10,6 +10,13 @@ The infrastructure deployment includes the following:
     - encrypted by KMS_MANAGED key
     - registered in Lakeformation as a data lake
     - naming convention is s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}
+- A new S3 bucket for Amazon Managed Workflows for Apache Airflow (MWAA) 
+    - auto-upload files from ./deployment/requirements/
+    - used for MAAA DAGs
+    - naming converion is s3://emr-roadshow-airflowstac-emrserverlessairflow*
+- A MWAA Environment
+    - install `apache-airflow-providers-amazon` pip package for EMR Serverless operator
+    - `*EMR-Serverless-MWAARole*` IAM role for MAWW environment
 - An EKS cluster v1.24 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
