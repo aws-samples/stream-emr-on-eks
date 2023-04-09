@@ -228,7 +228,9 @@ class AirflowStack(NestedStack):
         )
         mwaa_env.node.add_dependency(role)
         mwaa_env.node.add_dependency(self.deploy)
+
         CfnOutput(self, "MWAA_NAME", value=self.env_name)
+        CfnOutput(self, "MWAA_S3_BUCKET", value=self.airflow_bucket.bucket_name)
 
 
 
