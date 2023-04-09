@@ -11,6 +11,7 @@
     Resource:
     - arn:aws:s3:::{{codeBucket}}/*
     - arn:aws:s3:::lf-datalake-{{AccountID}}-{{REGION}}/*
+    - arn:aws:s3:::us-east-1.elasticmapreduce/*
   - Effect: Allow
     Action:
     - s3:DeleteObject
