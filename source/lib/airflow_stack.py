@@ -27,11 +27,11 @@ class AirflowStack(NestedStack):
             auto_delete_objects=True
         )
         proj_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]
-        self.deploy=s3deploy.BucketDeployment(self, "UploadRequirements",
+        self.upload_req=s3deploy.BucketDeployment(self, "UploadRequirements",
             sources=[s3deploy.Source.asset(proj_dir+'/deployment/requirements')],
             destination_bucket= self.airflow_bucket,
-            destination_key_prefix="requirements",
-            memory_limit=256
+            destination_key_prefix="requirements"
+            # memory_limit=256
         )
         self.bucket_name = self.airflow_bucket.bucket_name
 
@@ -100,7 +100,7 @@ class AirflowStack(NestedStack):
             webserver_access_mode="PUBLIC_ONLY",
         )
         mwaa_env.node.add_dependency(_mwaa_role)
-        mwaa_env.node.add_dependency(self.deploy)
+        mwaa_env.node.add_dependency(self.upload_req)
 
 
 
