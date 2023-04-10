@@ -38,6 +38,15 @@ The infrastructure deployment includes the following:
 - Two EMR runtime roles
     - lf-data-access-engineer: the runtime role with LakeFormation data access permission designed for *Data Engineers* who can create DB and tables etc.
     - lf-data-access-analyst: the runtime role with LakeFormation data access permission designed for *Data Analyst* who have tag-based LF read-only permission
+- Lake Formation
+    - registered the newly created DataLake S3 bucket as the data lake location
+    - created a Data location for lf-data-access-engineer role
+    - created a permission for lf-data-access-analyst role to describe the 'default' DB
+
+NOTE: if use CDK deployment, the above Lake Formation configurations will fail because CDK IAM role doesn't have the priviliage to set up the permission in Lake Formation.
+
+Follow the `Customization` section to deploy via CFN, or comment out the `lf_stack` in `app.py` then "CDK deploy".
+
 ### CloudFormation Deployment
 
   |   Region  |   Launch Template |
