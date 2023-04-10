@@ -61,7 +61,8 @@ class EMREC2Stack(NestedStack):
         _iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-iam-role.yaml', 
             fields= {
                 "{{codeBucket}}": code_bucket,
-                "{{AccountID}}": Aws.ACCOUNT_ID
+                "{{AccountID}}": Aws.ACCOUNT_ID,
+                "{{REGION}}": Aws.REGION
             })
         for statmnt in _iam:
             _emr_job_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)

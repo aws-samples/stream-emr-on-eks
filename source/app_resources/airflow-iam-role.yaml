@@ -1,0 +1,90 @@
+- Effect: Allow
+  Action: 
+  - airflow:PublishMetrics
+  Resource:
+  - arn:aws:airflow:{{REGION}}:{{AccountID}}:environment/{{env_name}}
+- Effect: Deny
+  Action:
+  - s3:ListAllMyBuckets
+  Resource:
+  - arn:aws:s3:::{{codeBucket}}/*
+  - arn:aws:s3:::{{codeBucket}}
+- Effect: Allow
+  Action: 
+    - '*'
+  Resource:
+    - '*'   
+- Effect: Allow
+  Action:    
+  - logs:CreateLogStream
+  - logs:CreateLogGroup
+  - logs:PutLogEvents
+  - logs:GetLogEvents
+  - logs:GetLogRecord
+  - logs:GetLogGroupFields
+  - logs:GetQueryResults
+  - logs:DescribeLogGroups
+  Resource:
+  - arn:aws:logs:{{REGION}}:{{AccountID}}:log-group:airflow-{{env_name}}-*
+- Effect: Allow
+  Action: 
+  - cloudwatch:PutMetricData
+  Resource:
+    - '*'
+- Effect: Allow
+  Action:
+  - sts:AssumeRole
+  Resource:
+    - '*'  
+- Effect: Allow
+  Action:
+  - sqs:ChangeMessageVisibility
+  - sqs:DeleteMessage
+  - sqs:GetQueueAttributes
+  - sqs:GetQueueUrl
+  - sqs:ReceiveMessage
+  - sqs:SendMessage
+  Resource:
+  - arn:aws:sqs:{{REGION}}:*:airflow-celery-*
+- Effect: Allow
+  Action:
+  - kms:Decrypt
+  - kms:DescribeKey
+  - kms:GenerateDataKey*
+  - kms:Encrypt
+  Resource:
+    - '*'
+  Condition:
+    StringEquals:
+      kms:ViaService:
+      - sqs.{{REGION}}.amazonaws.com
+      - s3.{{REGION}}.amazonaws.com
+- Effect: Allow
+  Action:
+  - emr-serverless:CreateApplication
+  - emr-serverless:GetApplication
+  - emr-serverless:StartApplication
+  - emr-serverless:StopApplication
+  - emr-serverless:DeleteApplication
+  - emr-serverless:StartJobRun
+  - emr-serverless:GetJobRun   
+  Resource:
+    - '*'
+- Effect: Allow
+  Action:
+  - iam:PassRole
+  Resource:
+    - '*'
+  Condition:
+    StringLike:
+      iam:PassedToService: emr-serverless.amazonaws.com
+- Effect: Allow
+  Action:
+  - ec2:DescribeInstances
+  - ec2:CreateNetworkInterface
+  - ec2:AttachNetworkInterface
+  - ec2:DescribeNetworkInterfaces
+  - autoscaling:CompleteLifecycleAction
+  - ec2:DeleteNetworkInterface
+  Resource:
+    - '*'

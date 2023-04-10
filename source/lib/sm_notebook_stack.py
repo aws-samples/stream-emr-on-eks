@@ -8,7 +8,7 @@ from aws_cdk.aws_ec2 import (IVpc,SecurityGroup,Port)
 
 class NotebookStack(NestedStack):
 
-    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, code_bucket: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id:str, livy_sg:str, eksvpc: IVpc, sagemaker_role:IRole, code_bucket:str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # setup env and download example notebook
@@ -36,6 +36,7 @@ class NotebookStack(NestedStack):
                 content=Fn.base64(onCreateScript)
             )])
         sm_sg=SecurityGroup.from_security_group_id(self, "notebook_sg", eksvpc.vpc_default_security_group,mutable=False)
+        
         sm_notebook=sm.CfnNotebookInstance(self, "notebook", 
             notebook_instance_name="emr-runtime-lf-notebook",
             instance_type="ml.t3.medium",

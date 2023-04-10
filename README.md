@@ -87,28 +87,17 @@ The following `post-deployment.sh` is executable in Linux, not for Mac OSX. Modi
 VPC prefix: 'emr-stream-demo'
 Instance Type: 't3.small'
 ```
-2. [Attach the `Cloud9Admin` IAM role to your Cloud9 IDE](https://www.eksworkshop.com/020_prerequisites/ec2instance/). 
-
-3. Run the command to turn off the AWS managed temporary credentials in Cloud9:
-```bash
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install --update
-/usr/local/bin/aws cloud9 update-environment  --environment-id $C9_PID --managed-credentials-action DISABLE
-rm -vf ${HOME}/.aws/credentials
-```
-
-4. Setup the connection to MSK & EKS in Cloud9:
+2. Setup the connection to MSK & EKS in Cloud9:
 ```bash
 curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/workshop/deployment/app_code/post-deployment.sh | bash
 ```
-5. Wait for 5 mins, then check the [MSK cluster](https://console.aws.amazon.com/msk/) status. Make sure it is `active` before sending data to the cluster.
-6. Launching a new termnial window in Cloud9, send the sample data to MSK:
+3. Wait for 5 mins, then check the [MSK cluster](https://console.aws.amazon.com/msk/) status. Make sure it is `active` before sending data to the cluster.
+4. Launching a new termnial window in Cloud9, send the sample data to MSK:
 ```bash
 wget https://github.com/xuite627/workshop_flink1015-1/raw/master/dataset/nycTaxiRides.gz
 zcat nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.8.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.2"  > /dev/null
 ```
-6. Launching the 2nd termnial window and monitor the source MSK topic in Cloud9:
+5. Launching the 2nd termnial window and monitor the source MSK topic in Cloud9:
 ```bash
 kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \
