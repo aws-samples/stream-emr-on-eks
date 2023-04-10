@@ -39,7 +39,7 @@ class AirflowStack(NestedStack):
         _mwaa_role = iam.Role(self,"EMR-Serverless-MWAARole",
             assumed_by=iam.CompositePrincipal(
                 iam.ServicePrincipal("airflow.amazonaws.com"),
-                iam.ServicePrincipal("airflow-env.amazonaws.com"),
+                iam.ServicePrincipal("airflow-env.amazonaws.com")
             )
         )
 

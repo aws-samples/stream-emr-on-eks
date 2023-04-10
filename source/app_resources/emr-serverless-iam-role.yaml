@@ -1,0 +1,26 @@
+- Effect: Allow
+  Action:
+  - s3:PutObject
+  - s3:GetObject
+  - s3:ListBucket
+  - s3:DeleteObject
+  Resource:
+  - arn:aws:s3:::{{codeBucket}}/*
+  - arn:aws:s3:::{{codeBucket}}
+- Effect: Allow
+  Action:
+  - glue:GetDatabase
+  - glue:CreateDatabase
+  - glue:GetDataBases
+  - glue:CreateTable
+  - glue:GetTable
+  - glue:UpdateTable
+  - glue:DeleteTable
+  - glue:GetTables
+  - glue:GetPartition
+  - glue:GetPartitions
+  - glue:CreatePartition
+  - glue:BatchCreatePartition
+  - glue:GetUserDefinedFunctions
+  Resource:
+    - '*'

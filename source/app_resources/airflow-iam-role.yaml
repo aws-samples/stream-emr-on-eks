@@ -11,9 +11,14 @@
   - arn:aws:s3:::{{codeBucket}}
 - Effect: Allow
   Action: 
-    - '*'
+    - s3:GetObject*
+    - s3:GetBucket*
+    - s3:List*
+    - s3:PutObject
+    - s3:DeleteObject
   Resource:
-    - '*'   
+  - arn:aws:s3:::{{codeBucket}}/*
+  - arn:aws:s3:::{{codeBucket}}
 - Effect: Allow
   Action:    
   - logs:CreateLogStream
@@ -23,19 +28,23 @@
   - logs:GetLogRecord
   - logs:GetLogGroupFields
   - logs:GetQueryResults
-  - logs:DescribeLogGroups
   Resource:
   - arn:aws:logs:{{REGION}}:{{AccountID}}:log-group:airflow-{{env_name}}-*
 - Effect: Allow
   Action: 
-  - cloudwatch:PutMetricData
+  - s3:GetAccountPublicAccessBlock
   Resource:
     - '*'
 - Effect: Allow
-  Action:
-  - sts:AssumeRole
+  Action: 
+  - logs:DescribeLogGroups
   Resource:
-    - '*'  
+    - '*'
+- Effect: Allow
+  Action: 
+  - cloudwatch:PutMetricData
+  Resource:
+    - '*'    
 - Effect: Allow
   Action:
   - sqs:ChangeMessageVisibility
@@ -52,29 +61,32 @@
   - kms:DescribeKey
   - kms:GenerateDataKey*
   - kms:Encrypt
-  Resource:
-    - '*'
+  Resource: 
+  - arn:aws:kms:{{REGION}}:{{AccountID}}:key/*"
   Condition:
-    StringEquals:
+    StringLike:
       kms:ViaService:
       - sqs.{{REGION}}.amazonaws.com
       - s3.{{REGION}}.amazonaws.com
 - Effect: Allow
   Action:
   - emr-serverless:CreateApplication
+  - emr-serverless:ListApplications
   - emr-serverless:GetApplication
   - emr-serverless:StartApplication
   - emr-serverless:StopApplication
   - emr-serverless:DeleteApplication
   - emr-serverless:StartJobRun
+  - emr-serverless:CancelJobRun
   - emr-serverless:GetJobRun   
+  - emr-serverless:ListJobRuns
   Resource:
     - '*'
 - Effect: Allow
   Action:
   - iam:PassRole
   Resource:
-    - '*'
+  - arn:aws:iam::{{AccountID}}:role/*
   Condition:
     StringLike:
       iam:PassedToService: emr-serverless.amazonaws.com
@@ -88,3 +100,12 @@
   - ec2:DeleteNetworkInterface
   Resource:
     - '*'
+- Effect: Allow
+  Action:
+  - ec2:CreateNetworkInterface
+  - ec2:DeleteNetworkInterface
+  Resource:
+  - arn:aws:ec2:*:*:network-interface/*
+  Condition:
+    StringEquals:
+      aws:CalledViaLast: ops.emr-serverless.amazonaws.com

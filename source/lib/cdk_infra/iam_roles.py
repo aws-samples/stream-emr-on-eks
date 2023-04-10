@@ -149,11 +149,9 @@ class IamConst(Construct):
             role_name="lf-sagemaker-role",  
             assumed_by=iam.ServicePrincipal('sagemaker.amazonaws.com')
         )
-
         _sm_iam = load_yaml_replace_var_local(source_dir+'/app_resources/lf-sagemaker-role.yaml', 
             fields= {
                 "{{AccountID}}": Aws.ACCOUNT_ID,
-                "{{REGION}}": Aws.REGION,
                 "{{codeBucket}}": code_bucket
             })
         for statmnt in _sm_iam:
@@ -161,34 +159,15 @@ class IamConst(Construct):
         )
         self._sm_role.apply_removal_policy(RemovalPolicy.DESTROY)
 
-        self.emr_serverless_job_role = iam.Role(self,'EMRServerlessRuntimeRole',
-                                                assumed_by=iam.ServicePrincipal('emr-serverless.amazonaws.com')
-                                                )
-        self.emr_serverless_job_role.add_to_policy(iam.PolicyStatement(
-            resources=["*"],
-            actions=[
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:PutObject",
-                "s3:DeleteObject"
-            ],
-        ))
-        self.emr_serverless_job_role.add_to_policy(iam.PolicyStatement(
-            resources=["*"],
-            actions=[
-                "glue:GetDatabase",
-                "glue:CreateDatabase",
-                "glue:GetDataBases",
-                "glue:CreateTable",
-                "glue:GetTable",
-                "glue:UpdateTable",
-                "glue:DeleteTable",
-                "glue:GetTables",
-                "glue:GetPartition",
-                "glue:GetPartitions",
-                "glue:CreatePartition",
-                "glue:BatchCreatePartition",
-                "glue:GetUserDefinedFunctions"
-            ],
-        ))
-        
+        # EMR Serverless job runtime role
+        self._emrs_job_role = iam.Role(self,'EMRServerlessRuntimeRole',
+            assumed_by=iam.ServicePrincipal('emr-serverless.amazonaws.com')
+        )
+        _emrs_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-serverless-iam-role.yaml', 
+            fields= {
+                "{{codeBucket}}": code_bucket
+            })
+        for statmnt in _emrs_iam:
+            self._emrs_job_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
+        self._emrs_job_role.apply_removal_policy(RemovalPolicy.DESTROY)
