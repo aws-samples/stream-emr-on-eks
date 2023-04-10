@@ -48,31 +48,14 @@ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/d
 sudo mv /tmp/eksctl /usr/local/bin
 eksctl version
 
-# 3. Update MSK with custom configuration
-base64 <<EoF >msk-config.txt
-auto.create.topics.enable=true
-log.retention.minutes=1440
-zookeeper.connection.timeout.ms=1000
-log.roll.ms=60480000
-EoF
 
-validate=$(aws kafka list-configurations --query 'Configurations[?Name==`autotopic`].Arn' --output text)
-if [ -z "$validate" ]; then
-    echo "Update MSK configuration ..."
-
-    configArn=$(aws kafka create-configuration --name "autotopic" --description "Topic autocreation enabled; Log retention 24h; Apache ZooKeeper timeout 1000 ms; Log rolling 16h." --server-properties file://msk-config.txt | jq -r '.Arn')
-    msk_cluster=$(aws kafka list-clusters --region $AWS_REGION --query 'ClusterInfoList[?ClusterName==`'$stack_name'`].ClusterArn' --output text)
-    msk_version=$(aws kafka describe-cluster --cluster-arn ${msk_cluster} --query "ClusterInfo.CurrentVersion" --output text)
-    aws kafka update-cluster-configuration --cluster-arn ${msk_cluster} --configuration-info '{"Arn": "'$configArn'","Revision": 1 }' --current-version ${msk_version}
-fi
-
-# 4. install Kafka Client
+# 3. install Kafka Client
 echo "Installing Kafka Client tool ..."
 wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz
 tar -xzf kafka_2.12-2.8.1.tgz
 rm kafka_2.12-2.8.1.tgz
 
-# 5. connect to the EKS newly created
+# 4. connect to the EKS newly created
 echo $(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?starts_with(OutputKey,'eksclusterEKSConfig')].OutputValue" --output text) | bash
 echo "Testing EKS connection..."
 kubectl get svc
