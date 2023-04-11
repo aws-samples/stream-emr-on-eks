@@ -23,6 +23,8 @@
   - iam:AddRoleToInstanceProfile
   - iam:RemoveRoleFromInstanceProfile
   - iam:DetachRolePolicy
+  - iam:CreateServiceLinkedRole
+  - fis:*
   Resource: 
     - "*"
 - Effect: Allow
