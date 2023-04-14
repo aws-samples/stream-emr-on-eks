@@ -1,0 +1,6 @@
+region,vcpu_per_hour_price,memory_per_GB_per_hour_price
+us-east-1,0.052624,0.0057785
+us-east-2,0.052624,0.0057785
+us-west-1,0.060528,0.006643
+us-west-2,0.052624,0.0057785
+ap-southeast-1,0.065728,0.007189
