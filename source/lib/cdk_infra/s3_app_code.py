@@ -28,4 +28,11 @@ class S3AppCodeConst(Construct):
             destination_key_prefix="app_code",
             memory_limit=256
         )
+
+        self.deploy=s3deploy.BucketDeployment(self, "DeployCostEstimatorCode",
+            sources=[s3deploy.Source.asset(proj_dir+'/deployment/cost_estimator')],
+            destination_bucket= self._artifact_bucket,
+            destination_key_prefix="cost_estimator",
+            memory_limit=256
+        )
         self.bucket_name = self._artifact_bucket.bucket_name

@@ -38,4 +38,3 @@ Config
 **/.coverage
 **/.coveragerc
 **/coverage-reports/
-*.jar
