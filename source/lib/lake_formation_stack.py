@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 #
 from constructs import Construct
-from aws_cdk import (Fn,Aws,NestedStack,RemovalPolicy,aws_s3 as s3,aws_iam as iam,aws_lakeformation as lf)
+from aws_cdk import (DefaultStackSynthesizer,Fn,Aws,NestedStack,RemovalPolicy,aws_s3 as s3,aws_iam as iam,aws_lakeformation as lf)
 
 
 class LFStack(NestedStack):
@@ -25,30 +25,49 @@ class LFStack(NestedStack):
             use_service_linked_role=False,
             role_arn=engineer_role.role_arn
         )
-        # Create a Data location for engineer role
-        _engineer_role=lf.CfnPermissions.DataLakePrincipalProperty(
-            data_lake_principal_identifier=engineer_role.role_arn
+  
+        # The role assumed by cdk is not a data lake administrator.
+        # So, deploying PrincipalPermissions meets the error such as:
+        # "Resource does not exist or requester is not authorized to access requested permissions."
+        # In order to solve the error, it is necessary to promote the cdk execution role to the data lake administrator.
+        default_cdk_exec_role=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/cdk-hnb659fds-cfn-exec-role-{Aws.ACCOUNT_ID}-{Aws.REGION}"
+        cfn_data_lake_settings = lf.CfnDataLakeSettings(self, "CfnDataLakeSettings",
+            admins=[lf.CfnDataLakeSettings.DataLakePrincipalProperty(
+                data_lake_principal_identifier=default_cdk_exec_role
+            )]
         )
-        _data_location1=lf.CfnPermissions(self, "DataLocation", 
-            data_lake_principal=_engineer_role,
-            resource=lf.CfnPermissions.ResourceProperty(
-                data_location_resource=lf.CfnPermissions.DataLocationResourceProperty(
-                    s3_resource=self.lf_bucket.bucket_arn
-                )
-            ),
-            permissions=['DATA_LOCATION_ACCESS']
-        )
-        _data_location1.add_dependency(_dl_location)
+        cfn_data_lake_settings.apply_removal_policy(RemovalPolicy.DESTROY)
         
-        # create a describe permission for analyst role to access default DB
-        _analyst_principal=lf.CfnPermissions.DataLakePrincipalProperty(
-                data_lake_principal_identifier=analyst_role.role_arn
-        )
-        _data_location2=lf.CfnPermissions(self, "DBDataLocation", 
-            data_lake_principal=_analyst_principal,
-            resource=lf.CfnPermissions.ResourceProperty(
-                database_resource=lf.CfnPermissions.DatabaseResourceProperty(name="default")
+        # Create a Data location for engineer role
+        engineer_perm = lf.CfnPrincipalPermissions(self, "EngineerDataLocation",
+            permissions=["DATA_LOCATION_ACCESS"],
+            permissions_with_grant_option=[],
+            principal=lf.CfnPrincipalPermissions.DataLakePrincipalProperty(
+                data_lake_principal_identifier=engineer_role.role_arn
             ),
-            permissions=['DESCRIBE']
+            resource=lf.CfnPrincipalPermissions.ResourceProperty(
+                data_location=lf.CfnPrincipalPermissions.DataLocationResourceProperty(
+                    catalog_id=Aws.ACCOUNT_ID,
+                    resource_arn=self.lf_bucket.bucket_arn
+                )
+            )    
         )
-        _data_location2.add_dependency(_data_location1)
+        engineer_perm.add_dependency(cfn_data_lake_settings)
+        engineer_perm.apply_removal_policy(RemovalPolicy.DESTROY)  
+
+        # Add a Database permission for analyst role
+        analyst_perm = lf.CfnPrincipalPermissions(self, "analystDBPermission",
+            permissions=["DESCRIBE"],
+            permissions_with_grant_option=[],
+            principal=lf.CfnPrincipalPermissions.DataLakePrincipalProperty(
+                data_lake_principal_identifier=analyst_role.role_arn
+            ),
+            resource=lf.CfnPrincipalPermissions.ResourceProperty(
+                database=lf.CfnPrincipalPermissions.DatabaseResourceProperty(
+                    catalog_id=Aws.ACCOUNT_ID,
+                    name="default"
+                )
+            )
+        )
+        analyst_perm.add_dependency(cfn_data_lake_settings)
+        analyst_perm.apply_removal_policy(RemovalPolicy.DESTROY)
