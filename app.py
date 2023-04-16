@@ -16,7 +16,7 @@ emr_release_v=app.node.try_get_context('emr_version')
 # 1.main stacks
 eks_stack = SparkOnEksStack(app, proj_name, proj_name)
 # 2.setup Lakeformation
-lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.LFAnalystRole,eks_stack.datalake_bucket)
+lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.datalake_bucket)
 # 3.setup EMR on EC2
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole,eks_stack.datalake_bucket.bucket_name)
 # 4. the rest of nested stacks

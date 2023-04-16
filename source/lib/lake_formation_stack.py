@@ -7,7 +7,7 @@ import boto3
 
 class LFStack(NestedStack):
 
-    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole, analyst_role: iam.IRole,lf_bucket:s3.IBucket, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole,lf_bucket:s3.IBucket, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Register the s3 as data lake location
@@ -22,7 +22,7 @@ class LFStack(NestedStack):
         # "Resource does not exist or requester is not authorized to access requested permissions."
         # In order to solve the error, it is necessary to promote the cdk execution role to the data lake administrator.
         iam_client = boto3.client("iam")
-        # sts_client = boto3.client("sts").get_caller_identity()
+        sts_client = boto3.client("sts").get_caller_identity()
         # account_id = sts_client.get("Account")
         # region_name = boto3.client('s3').meta.region_name
         # default_cdk_exec_role=f'cdk-hnb659fds-cfn-exec-role-{account_id}-{region_name}'
