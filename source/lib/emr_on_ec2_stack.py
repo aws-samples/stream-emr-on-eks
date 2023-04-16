@@ -191,7 +191,7 @@ class EMREC2Stack(NestedStack):
                     action_on_failure="CANCEL_AND_WAIT",
                     hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                         jar="command-runner.jar",
-                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://{dl_bucket.bucket_name}/raw/ticket_purchase_hist && aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample s3://{code_bucket}/data"]
+                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://{dl_bucket}/raw/ticket_purchase_hist && aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample s3://{code_bucket}/data"]
                     )
                  )]
         )
