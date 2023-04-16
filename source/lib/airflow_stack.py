@@ -102,7 +102,4 @@ class AirflowStack(NestedStack):
         mwaa_env.node.add_dependency(_mwaa_role)
         mwaa_env.node.add_dependency(self.upload_req)
 
-
-
-
     
