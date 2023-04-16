@@ -68,6 +68,7 @@ class LFStack(NestedStack):
             )    
         )
         engineer_perm.add_dependency(_dladmin)
+        engineer_perm.add_dependency(_dl_location)
         engineer_perm.apply_removal_policy(RemovalPolicy.DESTROY)  
 
         # Add a Database permission for analyst role
@@ -85,4 +86,5 @@ class LFStack(NestedStack):
             )
         )
         analyst_perm.add_dependency(_dladmin)
+        analyst_perm.add_dependency(_dl_location)
         analyst_perm.apply_removal_policy(RemovalPolicy.DESTROY)
