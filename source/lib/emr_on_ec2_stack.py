@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: License :: OSI Approved :: MIT No Attribution License (MIT-0)
 #
 from constructs import Construct
-from aws_cdk import (CfnOutput, Aws, NestedStack, RemovalPolicy, Tags, CfnTag, aws_iam as iam, aws_ec2 as ec2, aws_efs as efs, aws_sagemaker as sm)
+from aws_cdk import (CfnOutput, Aws, NestedStack, RemovalPolicy, Tags, CfnTag, aws_iam as iam, aws_ec2 as ec2, aws_efs as efs, aws_sagemaker as sm, aws_s3 as s3)
 from aws_cdk.aws_emr import CfnCluster,CfnStep
 from lib.util.manifest_reader import load_yaml_replace_var_local
 import os
@@ -13,7 +13,7 @@ class EMREC2Stack(NestedStack):
         return self._instances.additional_master_security_groups[0]
 
 
-    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, engineer_role: iam.IRole, analyst_role: iam.IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, emr_version: str, cluster_name:str, eksvpc: ec2.IVpc, code_bucket:str, engineer_role: iam.IRole, analyst_role: iam.IRole, dl_bucket:s3.IBucket, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         source_dir=os.path.split(os.environ['VIRTUAL_ENV'])[0]+'/source'
@@ -191,7 +191,7 @@ class EMREC2Stack(NestedStack):
                     action_on_failure="CANCEL_AND_WAIT",
                     hadoop_jar_step=CfnCluster.HadoopJarStepConfigProperty(
                         jar="command-runner.jar",
-                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}/raw/ticket_purchase_hist && aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample s3://{code_bucket}/data"]
+                        args=["bash", "-c", f"aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample/ticket_purchase_hist s3://{dl_bucket.bucket_name}/raw/ticket_purchase_hist && aws s3 sync s3://aws-dataengineering-day.workshop.aws/data/dms_sample s3://{code_bucket}/data"]
                     )
                  )]
         )

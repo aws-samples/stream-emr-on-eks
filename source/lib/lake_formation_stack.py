@@ -7,21 +7,12 @@ import boto3
 
 class LFStack(NestedStack):
 
-    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole, analyst_role: iam.IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole, analyst_role: iam.IRole,lf_bucket:s3.IBucket, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-
-        # Create an empty datalake S3 bucket
-        self.lf_bucket=s3.Bucket(self, "LFbucket", 
-            bucket_name=f"lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}",
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            encryption=s3.BucketEncryption.KMS_MANAGED,
-            removal_policy= RemovalPolicy.DESTROY,
-            auto_delete_objects=True
-        )
 
         # Register the s3 as data lake location
         _dl_location=lf.CfnResource(self, "DataLakeLoation",
-            resource_arn=self.lf_bucket.bucket_arn,
+            resource_arn=lf_bucket.bucket_arn,
             use_service_linked_role=False,
             role_arn=engineer_role.role_arn
         )
@@ -63,7 +54,7 @@ class LFStack(NestedStack):
             resource=lf.CfnPrincipalPermissions.ResourceProperty(
                 data_location=lf.CfnPrincipalPermissions.DataLocationResourceProperty(
                     catalog_id=Aws.ACCOUNT_ID,
-                    resource_arn=self.lf_bucket.bucket_arn
+                    resource_arn=lf_bucket.bucket_arn
                 )
             )    
         )

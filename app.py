@@ -15,14 +15,14 @@ emr_release_v=app.node.try_get_context('emr_version')
 
 # 1.main stacks
 eks_stack = SparkOnEksStack(app, proj_name, proj_name)
-msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
-airflow_stack = AirflowStack(eks_stack, "AirflowStack", eks_stack.eksvpc, "emr-serverless-airflow")
 # 2.setup Lakeformation
-lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.LFAnalystRole)
+lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.LFAnalystRole,eks_stack.datalake_bucket)
 # 3.setup EMR on EC2
-emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole)
-# 4.setup Sagemaker notebook
+emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole,eks_stack.datalake_bucket)
+# 4. the rest of nested stacks
+msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
 sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole, eks_stack.code_bucket)
+airflow_stack = AirflowStack(eks_stack, "AirflowStack", eks_stack.eksvpc, "emr-serverless-airflow")
 
 Tags.of(eks_stack).add('project', proj_name)
 Tags.of(msk_stack).add('project', proj_name)
