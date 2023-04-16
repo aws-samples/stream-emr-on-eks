@@ -25,13 +25,12 @@ class LFStack(NestedStack):
         sts_client = boto3.client("sts").get_caller_identity()
         account_id = sts_client.get("Account")
         region_name = boto3.client('s3').meta.region_name
-
         default_cdk_exec_role=f'cdk-hnb659fds-cfn-exec-role-{account_id}-{region_name}'
         try:
             iam_client.get_role(RoleName=default_cdk_exec_role)
             _dladmin = lf.CfnDataLakeSettings(self, "CfnDataLakeAdmin",
                 admins=[lf.CfnDataLakeSettings.DataLakePrincipalProperty(
-                    data_lake_principal_identifier=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/{default_cdk_exec_role}"
+                    data_lake_principal_identifier=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/cdk-hnb659fds-cfn-exec-role-{Aws.ACCOUNT_ID}-{Aws.REGION}"
                 )]
             )
         except iam_client.exceptions.NoSuchEntityException:
