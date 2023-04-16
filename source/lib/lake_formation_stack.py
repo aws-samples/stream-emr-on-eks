@@ -22,12 +22,12 @@ class LFStack(NestedStack):
         # "Resource does not exist or requester is not authorized to access requested permissions."
         # In order to solve the error, it is necessary to promote the cdk execution role to the data lake administrator.
         iam_client = boto3.client("iam")
-        sts_client = boto3.client("sts").get_caller_identity()
-        account_id = sts_client.get("Account")
-        region_name = boto3.client('s3').meta.region_name
-        default_cdk_exec_role=f'cdk-hnb659fds-cfn-exec-role-{account_id}-{region_name}'
+        # sts_client = boto3.client("sts").get_caller_identity()
+        # account_id = sts_client.get("Account")
+        # region_name = boto3.client('s3').meta.region_name
+        # default_cdk_exec_role=f'cdk-hnb659fds-cfn-exec-role-{account_id}-{region_name}'
         try:
-            iam_client.get_role(RoleName=default_cdk_exec_role)
+            iam_client.get_role(RoleName='WSParticipantRole')
             _dladmin = lf.CfnDataLakeSettings(self, "CfnDataLakeAdmin",
                 admins=[lf.CfnDataLakeSettings.DataLakePrincipalProperty(
                     data_lake_principal_identifier=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/cdk-hnb659fds-cfn-exec-role-{Aws.ACCOUNT_ID}-{Aws.REGION}"
@@ -59,22 +59,4 @@ class LFStack(NestedStack):
         )
         engineer_perm.add_dependency(_dladmin)
         engineer_perm.add_dependency(_dl_location)
-        engineer_perm.apply_removal_policy(RemovalPolicy.DESTROY)  
-
-        # Add a Database permission for analyst role
-        analyst_perm = lf.CfnPrincipalPermissions(self, "analystDBPermission",
-            permissions=["DESCRIBE"],
-            permissions_with_grant_option=[],
-            principal=lf.CfnPrincipalPermissions.DataLakePrincipalProperty(
-                data_lake_principal_identifier=analyst_role.role_arn
-            ),
-            resource=lf.CfnPrincipalPermissions.ResourceProperty(
-                database=lf.CfnPrincipalPermissions.DatabaseResourceProperty(
-                    catalog_id=Aws.ACCOUNT_ID,
-                    name="default"
-                )
-            )
-        )
-        analyst_perm.add_dependency(_dladmin)
-        analyst_perm.add_dependency(_dl_location)
-        analyst_perm.apply_removal_policy(RemovalPolicy.DESTROY)
+        engineer_perm.apply_removal_policy(RemovalPolicy.DESTROY)
