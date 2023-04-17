@@ -91,7 +91,7 @@ class EksConst(Construct):
             iam_client.get_role(RoleName='WSParticipantRole')
             _current_role = Role.from_role_arn(self,
                 "participant_role",
-                role_arn=f"arn:aws:sts::{Aws.ACCOUNT_ID}:assumed-role/WSParticipantRole/Participant"
+                role_arn=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/WSParticipantRole"
             )
         except iam_client.exceptions.NoSuchEntityException:
             sts_client = boto3.client("sts")
