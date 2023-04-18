@@ -59,8 +59,13 @@
   Action:
   - kms:*
   Resource: 
-  - '*'
- - Effect: Allow
+  - arn:aws:kms:{{REGION}}:{{AccountID}}:key/*"
+  Condition:
+    StringLike:
+      kms:ViaService:
+      - sqs.{{REGION}}.amazonaws.com
+      - s3.{{REGION}}.amazonaws.com
+- Effect: Allow
   Action:
   - emr-serverless:CreateApplication
   - emr-serverless:ListApplications
