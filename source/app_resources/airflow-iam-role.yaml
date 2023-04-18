@@ -59,7 +59,7 @@
   Action:
   - kms:*
   Resource: 
-  - arn:aws:kms:{{REGION}}:{{AccountID}}:key/*"
+  - '*'
 - Effect: Allow
   Action:
   - emr-serverless:CreateApplication
