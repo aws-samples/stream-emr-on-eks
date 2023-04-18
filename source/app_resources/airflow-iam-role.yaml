@@ -57,18 +57,10 @@
   - arn:aws:sqs:{{REGION}}:*:airflow-celery-*
 - Effect: Allow
   Action:
-  - kms:Decrypt
-  - kms:DescribeKey
-  - kms:GenerateDataKey*
-  - kms:Encrypt
+  - kms:*
   Resource: 
-  - arn:aws:kms:{{REGION}}:{{AccountID}}:key/*"
-  Condition:
-    StringLike:
-      kms:ViaService:
-      - sqs.{{REGION}}.amazonaws.com
-      - s3.{{REGION}}.amazonaws.com
-- Effect: Allow
+  - '*'
+ - Effect: Allow
   Action:
   - emr-serverless:CreateApplication
   - emr-serverless:ListApplications
