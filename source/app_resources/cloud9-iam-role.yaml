@@ -25,6 +25,8 @@
   - iam:DetachRolePolicy
   - iam:CreateServiceLinkedRole
   - fis:*
+  - iam:PassRole
+  - cloudformation:CreateStack
   Resource: 
     - "*"
 - Effect: Allow

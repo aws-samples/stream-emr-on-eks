@@ -3,52 +3,60 @@
 #
 from constructs import Construct
 from aws_cdk import (Fn,Aws,NestedStack,RemovalPolicy,aws_s3 as s3,aws_iam as iam,aws_lakeformation as lf)
-
+import boto3
 
 class LFStack(NestedStack):
 
-    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole, analyst_role: iam.IRole, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, engineer_role: iam.IRole,lf_bucket:s3.IBucket, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-
-        # Create an empty datalake S3 bucket
-        self.lf_bucket=s3.Bucket(self, "LFbucket", 
-            bucket_name=f"lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}",
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            encryption=s3.BucketEncryption.KMS_MANAGED,
-            removal_policy= RemovalPolicy.DESTROY,
-            auto_delete_objects=True
-        )
 
         # Register the s3 as data lake location
         _dl_location=lf.CfnResource(self, "DataLakeLoation",
-            resource_arn=self.lf_bucket.bucket_arn,
+            resource_arn=lf_bucket.bucket_arn,
             use_service_linked_role=False,
             role_arn=engineer_role.role_arn
         )
-        # Create a Data location for engineer role
-        _engineer_role=lf.CfnPermissions.DataLakePrincipalProperty(
-            data_lake_principal_identifier=engineer_role.role_arn
-        )
-        _data_location1=lf.CfnPermissions(self, "DataLocation", 
-            data_lake_principal=_engineer_role,
-            resource=lf.CfnPermissions.ResourceProperty(
-                data_location_resource=lf.CfnPermissions.DataLocationResourceProperty(
-                    s3_resource=self.lf_bucket.bucket_arn
-                )
-            ),
-            permissions=['DATA_LOCATION_ACCESS']
-        )
-        _data_location1.add_dependency(_dl_location)
+  
+        # The role assumed by cdk is not a data lake administrator.
+        # So, deploying PrincipalPermissions meets the error such as:
+        # "Resource does not exist or requester is not authorized to access requested permissions."
+        # In order to solve the error, it is necessary to promote the cdk execution role to the data lake administrator.
+        iam_client = boto3.client("iam")
+        sts_client = boto3.client("sts").get_caller_identity()
+        # account_id = sts_client.get("Account")
+        # region_name = boto3.client('s3').meta.region_name
+        # default_cdk_exec_role=f'cdk-hnb659fds-cfn-exec-role-{account_id}-{region_name}'
+        try:
+            iam_client.get_role(RoleName='WSParticipantRole')
+            _dladmin = lf.CfnDataLakeSettings(self, "CfnDataLakeAdmin",
+                admins=[lf.CfnDataLakeSettings.DataLakePrincipalProperty(
+                    data_lake_principal_identifier=f"arn:aws:iam::{Aws.ACCOUNT_ID}:role/cdk-hnb659fds-cfn-exec-role-{Aws.ACCOUNT_ID}-{Aws.REGION}"
+                )]
+            )
+        except iam_client.exceptions.NoSuchEntityException:
+            _current_arn = sts_client.get("Arn")
+            _dladmin = lf.CfnDataLakeSettings(self, "CfnDataLakeAdmin2",
+                admins=[lf.CfnDataLakeSettings.DataLakePrincipalProperty(
+                    data_lake_principal_identifier=_current_arn
+                )]
+            )
+        finally:
+            _dladmin.apply_removal_policy(RemovalPolicy.DESTROY)
         
-        # create a describe permission for analyst role to access default DB
-        _analyst_principal=lf.CfnPermissions.DataLakePrincipalProperty(
-                data_lake_principal_identifier=analyst_role.role_arn
-        )
-        _data_location2=lf.CfnPermissions(self, "DBDataLocation", 
-            data_lake_principal=_analyst_principal,
-            resource=lf.CfnPermissions.ResourceProperty(
-                database_resource=lf.CfnPermissions.DatabaseResourceProperty(name="default")
+        # Create a Data location for engineer role
+        engineer_perm = lf.CfnPrincipalPermissions(self, "EngineerDataLocation",
+            permissions=["DATA_LOCATION_ACCESS"],
+            permissions_with_grant_option=[],
+            principal=lf.CfnPrincipalPermissions.DataLakePrincipalProperty(
+                data_lake_principal_identifier=engineer_role.role_arn
             ),
-            permissions=['DESCRIBE']
+            resource=lf.CfnPrincipalPermissions.ResourceProperty(
+                data_location=lf.CfnPrincipalPermissions.DataLocationResourceProperty(
+                    catalog_id=Aws.ACCOUNT_ID,
+                    resource_arn=lf_bucket.bucket_arn
+                )
+            )    
         )
-        _data_location2.add_dependency(_data_location1)
+        engineer_perm.add_dependency(_dladmin)
+        engineer_perm.add_dependency(_dl_location)
+        engineer_perm.apply_removal_policy(RemovalPolicy.DESTROY)
