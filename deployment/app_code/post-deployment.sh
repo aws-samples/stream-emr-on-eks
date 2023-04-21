@@ -49,7 +49,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 eksctl version
 
 # Install Helm
-sudo curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 # 3. install Kafka Client
 echo "Installing Kafka Client tool ..."
