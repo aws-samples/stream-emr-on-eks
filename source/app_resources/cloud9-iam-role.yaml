@@ -27,6 +27,7 @@
   - fis:*
   - iam:PassRole
   - cloudformation:CreateStack
+  - emr-containers:ListVirtualClusters
   Resource: 
     - "*"
 - Effect: Allow
