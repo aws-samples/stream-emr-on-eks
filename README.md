@@ -97,7 +97,7 @@ The following `post-deployment.sh` is executable in Linux, not for Mac OSX. Modi
 VPC prefix: 'emr-stream-demo'
 Instance Type: 't3.small'
 ```
-2. [Attach the IAM role that contains `Cloud9Admin` to your IDE](https://www.eksworkshop.com/020_prerequisites/ec2instance/). 
+2. [Attach the IAM role that contains `Cloud9Admin` to your IDE](https://catalog.us-east-1.prod.workshops.aws/workshops/d90c2f2d-a84b-4e80-b4f9-f5cee0614426/en-US/30-emr-serverless/31-set-up-env#setup-cloud9-ide). 
 
 3. Turn off AWS managed temporary credentials in Cloud9:
 ```bash
