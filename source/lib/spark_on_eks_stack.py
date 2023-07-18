@@ -23,6 +23,10 @@ class SparkOnEksStack(Stack):
         return self.app_s3.datalake_bucket    
 
     @property
+    def serverless_bucket(self):
+        return self.app_s3.serverless_bucket       
+
+    @property
     def eksvpc(self):
         return self.network_sg.vpc
 
