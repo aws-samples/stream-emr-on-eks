@@ -7,6 +7,8 @@
   Resource:
   - arn:aws:s3:::{{codeBucket}}/*
   - arn:aws:s3:::{{codeBucket}}
+  - arn:aws:s3:::emrserverless-workshop-{{AccountID}}/*
+  - arn:aws:s3:::emrserverless-workshop-{{AccountID}}
 - Effect: Allow
   Action:
   - glue:GetDatabase

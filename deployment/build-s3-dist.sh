@@ -177,7 +177,7 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
         echo "Initiating virtual environment"
         python3 -m venv $venv_folder
         source $venv_folder/bin/activate
-        pip3 install --upgrade -q $template_dir --target $venv_folder/lib/python3.*/site-packages
+        pip3 install --upgrade pip setuptools wheel -q $template_dir --target $venv_folder/lib/python3.*/site-packages
         echo "package python artifact"
         cd $venv_folder/lib/python3.*/site-packages
         zip -qr9 $staging_dist_dir/$fname.zip . -x "aws_cdk/*"

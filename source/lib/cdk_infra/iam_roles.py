@@ -165,7 +165,8 @@ class IamConst(Construct):
         )
         _emrs_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-serverless-iam-role.yaml', 
             fields= {
-                "{{codeBucket}}": code_bucket
+                "{{codeBucket}}": code_bucket,
+                "{{AccountID}}": Aws.ACCOUNT_ID
             })
         for statmnt in _emrs_iam:
             self._emrs_job_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
