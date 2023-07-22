@@ -41,5 +41,6 @@ CfnOutput(eks_stack, "EMRExecRoleARN", value=eks_stack.EMRExecRole)
 CfnOutput(airflow_stack, "MWAA_S3_BUCKET", value=airflow_stack.mwaa_s3bucket)
 CfnOutput(airflow_stack, "MWAA_NAME", value=airflow_stack.mwaa_name)
 CfnOutput(eks_stack,"S3Bucket", value=eks_stack.serverless_bucket)
+CfnOutput(eks_stack,"EMRSRole", value=eks_stack.EMRS_role)
 
 app.synth()

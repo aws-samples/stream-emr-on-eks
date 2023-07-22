@@ -48,7 +48,11 @@ class SparkOnEksStack(Stack):
 
     @property
     def LFSagemakerRole(self):
-        return self.iam.lf_sagemaker_role   
+        return self.iam.lf_sagemaker_role  
+
+    @property
+    def EMRS_role(self):
+        return self.iam.emr_serverless_role     
 
     # @property
     # def assetURL(self):

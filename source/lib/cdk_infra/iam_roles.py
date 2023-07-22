@@ -39,6 +39,10 @@ class IamConst(Construct):
     @property
     def cloud9_ec2_role(self):
         return self._cloud9_role    
+
+    @property
+    def emr_serverless_role(self):
+        return self._emrs_job_role.role_name
        
 
     def __init__(self,scope: Construct, id:str, cluster_name:str, code_bucket:str, **kwargs) -> None:
