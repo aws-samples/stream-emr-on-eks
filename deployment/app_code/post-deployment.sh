@@ -25,16 +25,16 @@ echo "export EMR_ROLE_ARN=${EMR_ROLE_ARN}" | tee -a ~/.bash_profile
 
 
 # 1. setup Cloud9
-echo "Configuring Cloud9 ..."
-CLOUD9_INSTANCE_ID=$(aws ec2 describe-instances --filter Name=tag:aws:cloud9:environment,Values=$C9_PID --query Reservations[0].Instances[0].InstanceId --output text)
-Cloud9AdminRole=$(aws iam list-roles --query 'Roles[?Description==`cloud9admin`].RoleName | [0]')
-aws ec2 associate-iam-instance-profile --instance-id $CLOUD9_INSTANCE_ID --iam-instance-profile Name=$Cloud9AdminRole
+# echo "Configuring Cloud9 ..."
+# CLOUD9_INSTANCE_ID=$(aws ec2 describe-instances --filter Name=tag:aws:cloud9:environment,Values=$C9_PID --query Reservations[0].Instances[0].InstanceId --output text)
+# Cloud9AdminRole=$(aws iam list-roles --query 'Roles[?Description==`cloud9admin`].RoleName | [0]')
+# aws ec2 associate-iam-instance-profile --instance-id $CLOUD9_INSTANCE_ID --iam-instance-profile Name=$Cloud9AdminRole
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -q awscliv2.zip
-sudo ./aws/install --update
-/usr/local/bin/aws cloud9 update-environment  --environment-id $C9_PID --managed-credentials-action DISABLE
-rm -vf ${HOME}/.aws/credentials
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# unzip -q awscliv2.zip
+# sudo ./aws/install --update
+# /usr/local/bin/aws cloud9 update-environment  --environment-id $C9_PID --managed-credentials-action DISABLE
+# rm -vf ${HOME}/.aws/credentials
 
 # 2. install k8s command tools
 echo "Installing kubectl tool..."
