@@ -24,6 +24,7 @@
   - iam:RemoveRoleFromInstanceProfile
   - iam:DetachRolePolicy
   - iam:CreateServiceLinkedRole
+  - iam:UpdateAssumeRolePolicy
   - fis:*
   - iam:PassRole
   - cloudformation:CreateStack
