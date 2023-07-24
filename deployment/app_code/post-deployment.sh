@@ -27,18 +27,6 @@ echo "export EMR_ROLE_ARN=${EMR_ROLE_ARN}" | tee -a ~/.bash_profile
 echo "export S3Bucket=${S3Bucket}" | tee -a ~/.bash_profile
 echo "export EMRSRole=${EMRSRole}" | tee -a ~/.bash_profile
 
-# 1. setup Cloud9
-# echo "Configuring Cloud9 ..."
-# CLOUD9_INSTANCE_ID=$(aws ec2 describe-instances --filter Name=tag:aws:cloud9:environment,Values=$C9_PID --query Reservations[0].Instances[0].InstanceId --output text)
-# Cloud9AdminRole=$(aws iam list-roles --query 'Roles[?Description==`cloud9admin`].RoleName | [0]')
-# aws ec2 associate-iam-instance-profile --instance-id $CLOUD9_INSTANCE_ID --iam-instance-profile Name=$Cloud9AdminRole
-
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# unzip -q awscliv2.zip
-# sudo ./aws/install --update
-# /usr/local/bin/aws cloud9 update-environment  --environment-id $C9_PID --managed-credentials-action DISABLE
-# rm -vf ${HOME}/.aws/credentials
-
 # 2. install k8s command tools
 echo "Installing kubectl tool..."
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.24.10/2023-01-30/bin/linux/amd64/kubectl
@@ -60,7 +48,21 @@ wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz
 tar -xzf kafka_2.12-2.8.1.tgz
 rm kafka_2.12-2.8.1.tgz
 
-# 4. connect to the EKS newly created
+# 4. install EBS CSI driver
+export EKS_CLUSTER_NAME="emr-roadshow"
+
+eksctl create iamserviceaccount \
+  --name ebs-csi-controller-sa \
+  --namespace kube-system \
+  --cluster $EKS_CLUSTER_NAME \
+  --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+  --approve \
+  --role-only \
+  --role-name AmazonEKS_EBS_CSI_DriverRole
+
+eksctl create addon --name aws-ebs-csi-driver --cluster $EKS_CLUSTER_NAME --service-account-role-arn arn:aws:iam::$ACCOUNT_ID:role/AmazonEKS_EBS_CSI_DriverRole --force --region $AWS_REGION
+
+# 5. connect to the EKS newly created
 echo $(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].Outputs[?starts_with(OutputKey,'eksclusterEKSConfig')].OutputValue" --output text) | bash
 echo "Testing EKS connection..."
 kubectl get svc
