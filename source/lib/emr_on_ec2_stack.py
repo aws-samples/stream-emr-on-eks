@@ -178,13 +178,13 @@ class EMREC2Stack(NestedStack):
                     maximum_on_demand_capacity_units=1
                 )   
             ),
-            bootstrap_actions=[CfnCluster.BootstrapActionConfigProperty(
-                name="mountEFS",
-                script_bootstrap_action=CfnCluster.ScriptBootstrapActionConfigProperty(
-                    path=f"s3://{code_bucket}/app_code/job/emr-mount-efs.sh",
-                    args=[_efs.file_system_id, Aws.REGION]
-                )
-            )],
+            # bootstrap_actions=[CfnCluster.BootstrapActionConfigProperty(
+            #     name="mountEFS",
+            #     script_bootstrap_action=CfnCluster.ScriptBootstrapActionConfigProperty(
+            #         path=f"s3://{code_bucket}/app_code/job/emr-mount-efs.sh",
+            #         args=[_efs.file_system_id, Aws.REGION]
+            #     )
+            # )],
             steps=[
                 CfnCluster.StepConfigProperty(
                     name="cpSrcDatato2Buckets",
