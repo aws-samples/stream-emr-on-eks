@@ -69,7 +69,7 @@ class AirflowStack(NestedStack):
     
         mwaa_env = mwaa.CfnEnvironment(self,f"MWAAEnv{self.env_name}",
             name=self.env_name,
-            dag_s3_path="dags",
+            dag_s3_path="dags/",
             airflow_version="2.4.3",
             environment_class="mw1.small",
             max_workers=2,
