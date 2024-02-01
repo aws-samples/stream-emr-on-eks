@@ -34,7 +34,8 @@ class MSKStack(NestedStack):
         iam_client = boto3.client("iam")
         try:
             iam_client.get_role(RoleName='WSParticipantRole')
-            self._c9env = cloud9.CfnEnvironmentEC2(self, "kafkaClientEnv1", 
+            self._c9env = cloud9.CfnEnvironmentEC2(self, "kafkaClientEnv1",
+                image_id= "amazonlinux-2-x86_64",
                 name="workshop_ide",
                 instance_type="t3.small",
                 subnet_id=eksvpc.public_subnets[0].subnet_id,
