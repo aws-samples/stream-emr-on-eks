@@ -29,7 +29,7 @@ setuptools.setup(
         "pyyaml==5.4"
     ],
 
-    python_requires=">=3.8",
+    python_requires=">=3.7",
 
     classifiers=[
         "Development Status :: 4 - Beta",
