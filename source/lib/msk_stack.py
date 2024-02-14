@@ -44,6 +44,7 @@ class MSKStack(NestedStack):
             )
         except iam_client.exceptions.NoSuchEntityException:
             self._c9env = cloud9.CfnEnvironmentEC2(self, "KafkaClientEnv2", 
+                image_id= "amazonlinux-2-x86_64",
                 name="workshop_ide",
                 instance_type="t3.small",
                 subnet_id=eksvpc.public_subnets[0].subnet_id,

@@ -48,7 +48,11 @@ class SparkOnEksStack(Stack):
 
     @property
     def LFSagemakerRole(self):
-        return self.iam.lf_sagemaker_role  
+        return self.iam.lf_sagemaker_role 
+
+    @property
+    def LFCFNRoleARN(self):
+        return Fn.sub(self.synthesizer.cloud_formation_execution_role_arn) 
 
     @property
     def EMRS_role(self):

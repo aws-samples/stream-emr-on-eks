@@ -18,7 +18,7 @@ eks_stack = SparkOnEksStack(app, proj_name, proj_name)
 msk_stack = MSKStack(eks_stack,'kafka', proj_name, eks_stack.eksvpc)
 emr_ec2_stack = EMREC2Stack(eks_stack, 'emr-on-ec2', emr_release_v, proj_name, eks_stack.eksvpc, eks_stack.code_bucket, eks_stack.LFEngineerRole, eks_stack.LFAnalystRole,eks_stack.datalake_bucket.bucket_name)
 # 2. the rest of nested stacks
-lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.datalake_bucket)
+lf_stack = LFStack(eks_stack, 'lake_formation',eks_stack.LFEngineerRole,eks_stack.LFCFNRoleARN,eks_stack.datalake_bucket)
 sagemaker_nb_stack = NotebookStack(eks_stack, 'sm_notebook', emr_ec2_stack.livy_sg, eks_stack.eksvpc, eks_stack.LFSagemakerRole, eks_stack.code_bucket)
 airflow_stack = AirflowStack(eks_stack, "AirflowStack", eks_stack.eksvpc, "emr-serverless-airflow")
 
