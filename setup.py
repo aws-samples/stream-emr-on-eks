@@ -9,8 +9,8 @@ except IOError as e:
     long_description = ''
 
 setuptools.setup(
-    name="emr-roadshow",
-    version="2.0.0",
+    name="emr-bootcamp",
+    version="3.0.0",
 
     description="A CDK Python app for Spark Structured Streaming ETL",
     long_description=long_description,
