@@ -12,11 +12,11 @@ The infrastructure deployment includes the following:
     - naming convention is s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}
 - A new S3 bucket for Amazon Managed Workflows for Apache Airflow (MWAA) 
     - auto-upload files from ./deployment/requirements/
-    - used for MAAA DAGs
+    - used for MWAA DAGs
     - naming converion is s3://emr-roadshow-airflowstac-emrserverlessairflow*
 - A MWAA Environment
     - install `apache-airflow-providers-amazon` pip package for EMR Serverless operator
-    - `*EMR-Serverless-MWAARole*` IAM role for MAWW environment
+    - `*EMR-Serverless-MWAARole*` IAM role for MWAA environment
 - An EKS cluster v1.26 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
@@ -42,8 +42,6 @@ The infrastructure deployment includes the following:
     - registered the newly created DataLake S3 bucket as the data lake location
     - created a Data location for lf-data-access-engineer role
     - created a permission for lf-data-access-analyst role to describe the 'default' DB
-
-NOTE: if use CDK deployment, the above Lake Formation configurations will fail because CDK IAM role doesn't have the priviliage to set up the permission in Lake Formation.
 
 Follow the `Customization` section to deploy via CFN, or comment out the `lf_stack` in `app.py` then "CDK deploy".
 
