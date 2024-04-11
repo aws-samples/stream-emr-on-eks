@@ -28,6 +28,8 @@ class NotebookStack(NestedStack):
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
         
         aws s3 cp s3://{code_bucket}/app_code/job/EMR-lab-fine-grained-access-control.ipynb /home/ec2-user/SageMaker/
+        aws s3 cp s3://{code_bucket}/app_code/job/emr-bootcamp-iceberg-db-creation.ipynb /home/ec2-user/SageMaker/
+        aws s3 cp s3://{code_bucket}/app_code/job/emr-bootcamp-iceberg-table-read.ipynb /home/ec2-user/SageMaker/
         """
 
         sparkmagic_conf=sm.CfnNotebookInstanceLifecycleConfig(self, "oncreate_conf",
