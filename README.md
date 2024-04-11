@@ -17,7 +17,7 @@ The infrastructure deployment includes the following:
 - A MWAA Environment
     - install `apache-airflow-providers-amazon` pip package for EMR Serverless operator
     - `*EMR-Serverless-MWAARole*` IAM role for MAWW environment
-- An EKS cluster v1.24 in a new VPC across 2 AZs
+- An EKS cluster v1.26 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
 - An EMR virtual cluster in the same VPC
@@ -26,8 +26,8 @@ The infrastructure deployment includes the following:
     - All EMR on EKS configuration are done, including fine-grained access controls for pods by the AWS native solution IAM roles for service accounts
 - A Cloud9 IDE in the same VPC
     - automatically stop in 5 mins
-- An EMR on EC2 cluster.
-    - 1 primary and 1 core nodes with r5.xlarge
+- An EMR on EC2 cluster(emr6.15).
+    - used by Sagemaker 1 primary and 1 core nodes with r5.xlarge
     - configured to run one Spark job at a time.
     - managed scaling is enabled, can scale from 1 to 10
     - mounted EFS for checkpointing test/demo via a bootstrap action
