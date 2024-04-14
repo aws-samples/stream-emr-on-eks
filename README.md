@@ -6,21 +6,24 @@ The infrastructure deployment includes the following:
 - A new S3 bucket for applications
     - encrypted by KMS_MANAGED key
     - auto-upload files from ./deployment/app_code
-- A new DataLake S3 bucket
+- A new Lakeformation + DataLake S3 bucket
     - encrypted by KMS_MANAGED key
     - registered in Lakeformation as a data lake
     - naming convention is s3://lf-datalake-{Aws.ACCOUNT_ID}-{Aws.REGION}
 - A new S3 bucket for Amazon Managed Workflows for Apache Airflow (MWAA) 
     - auto-upload files from ./deployment/requirements/
     - used for MWAA DAGs
-    - naming converion is s3://emr-roadshow-airflowstac-emrserverlessairflow*
+    - naming converion is s3://emrserverless-airflow-{Aws.ACCOUNT_ID}-{Aws.REGION}
+- Two new S3 bucket for EMR serverless
+    - used for the Transactional Lab in EMRS, its name has the prefix of emrserverless-workshop-*
+    - used for interactive lab in EMRS, named 3://emrserverless-interactive-{Aws.ACCOUNT_ID}-{Aws.REGION}
 - A MWAA Environment
     - install `apache-airflow-providers-amazon` pip package for EMR Serverless operator
     - `*EMR-Serverless-MWAARole*` IAM role for MWAA environment
 - An EKS cluster v1.26 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
-- An EMR virtual cluster in the same VPC
+- An EMR on EKS virtual cluster in the same VPC
     - The virtual cluster links to `emr` namespace 
     - The namespace accommodates two types of Spark jobs, ie. run on managed node group or serverless job on Fargate
     - All EMR on EKS configuration are done, including fine-grained access controls for pods by the AWS native solution IAM roles for service accounts
@@ -35,14 +38,20 @@ The infrastructure deployment includes the following:
     - lf-sagemaker-role: SageMaker notebook instance role with support of EMR runtime role
     - an instance of notebook with 10GB of volume in a private subnet
     - no direct internet access
-- Two EMR runtime roles
+- Two EMR runtime roles for Fine-grained access control demo
     - lf-data-access-engineer: the runtime role with LakeFormation data access permission designed for *Data Engineers* who can create DB and tables etc.
     - lf-data-access-analyst: the runtime role with LakeFormation data access permission designed for *Data Analyst* who have tag-based LF read-only permission
 - Lake Formation
     - registered the newly created DataLake S3 bucket as the data lake location
     - created a Data location for lf-data-access-engineer role
     - created a permission for lf-data-access-analyst role to describe the 'default' DB
-
+- EMR Studio roles and Users
+    - emr-studio-service-role: setup the access for the S3 Bucket `emrserverless-interactive-{Aws.ACCOUNT_ID}-{Aws.REGION}`
+    - Studio Admin User: administrator with access of creating EMR studio & Workspace
+    - Studio Dev User: - developer with permissions to launch Workspace and create notebooks in it
+- An EMR Serverless role
+    - EMRServerlessRuntimeRole: EMR Serverless job runtime role for Stremaing & interactive labs
+ 
 Follow the `Customization` section to deploy via CFN, or comment out the `lf_stack` in `app.py` then "CDK deploy".
 
 ### CloudFormation Deployment
