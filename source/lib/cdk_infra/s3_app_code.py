@@ -18,6 +18,9 @@ class S3AppCodeConst(Construct):
     def serverless_bucket(self):
         return self._serverless_bucket.bucket_name
         
+    @property
+    def emrs_notebook_bucket(sef):
+        return self._emrs_notebook_bucket.bucket_name 
    
     def __init__(self,scope: Construct, id: str, **kwargs,) -> None:
         super().__init__(scope, id, **kwargs)
@@ -56,6 +59,14 @@ class S3AppCodeConst(Construct):
         # 3. Create serverless workshop s3 bucket for transactional data lake
         self._serverless_bucket=s3.Bucket(self,"EMRSDLbucket",
             bucket_name=f"emrserverless-workshop-{Aws.ACCOUNT_ID}",
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.KMS_MANAGED,
+            removal_policy= RemovalPolicy.DESTROY,
+            auto_delete_objects=True
+        )
+        # 4. Create interactive serverless s3 bucket
+        self._emrs_notebook_bucket=s3.Bucket(self,"EMRSNotebookbucket",
+            bucket_name=f"emrserverless-interactive-{Aws.ACCOUNT_ID}-{Aws.REGION}",
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.KMS_MANAGED,
             removal_policy= RemovalPolicy.DESTROY,

@@ -20,7 +20,8 @@ class AirflowStack(NestedStack):
         super().__init__(scope, id, **kwargs)
 
         self.env_name = env_name
-        self.airflow_bucket=s3.Bucket(self, "emr-serverless-airflow", 
+        self.airflow_bucket=s3.Bucket(self, "emr-serverless-airflow",
+            bucket_name=f"emrserverless-airflow-{Aws.ACCOUNT_ID}-{Aws.REGION}", 
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.KMS_MANAGED,
             removal_policy= RemovalPolicy.DESTROY,

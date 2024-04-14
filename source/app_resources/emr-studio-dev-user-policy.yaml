@@ -1,0 +1,54 @@
+- Effect: Allow
+  Action:
+  - ec2:DescribeVpcs
+  - ec2:DescribeSubnets
+  - ec2:DescribeSecurityGroups
+  Resource:
+    - '*'
+- Effect: Allow
+  Action:
+  - ec2:CreateNetworkInterface
+  Resource:
+  - arn:aws:ec2:*:*:subnet/*
+  - arn:aws:ec2:*:*:security-group/*
+  - arn:aws:ec2:*:*:network-interface/*
+- Effect: Allow
+  Action:
+  - emr-serverless:List*
+  - emr-serverless:Get*
+  - emr-serverless:*Application
+  - emr-serverless:*JobRun
+  - emr-serverless:AccessInteractiveEndpoints
+  Resource:
+    - '*'
+- Effect: Allow    
+  Action:
+  - elasticmapreduce:*Editor*
+  - elasticmapreduce:DescribeStudio
+  - elasticmapreduce:ListStudios
+  Resource:
+    - '*'
+- Effect: Allow   
+  Action:
+  - s3:ListAllMyBuckets
+  - s3:ListBucket
+  - s3:GetBucketLocation
+  - s3:GetObject
+  Resource:
+  - arn:aws:s3:::*'
+- Effect: Allow
+  Action:
+  - iam:ListRoles
+  Resource:
+    - '*'
+- Effect: Allow
+  Action:
+  - iam:PassRole
+  Resource:
+  - {{EMR_STUDIO_SVC_ROLE_ARN}}
+  - {{EMRS_RUNTIME_ROLE_ARN}}
+- Effect: Allow
+  Action: 
+  - elasticmapreduce:CreateStudioPresignedUrl
+  Resource:
+  - arn:aws:elasticmapreduce:{{REGION}}:{{AccountID}}:studio/*

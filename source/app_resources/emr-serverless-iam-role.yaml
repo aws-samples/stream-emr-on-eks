@@ -9,6 +9,8 @@
   - arn:aws:s3:::{{codeBucket}}
   - arn:aws:s3:::emrserverless-workshop-{{AccountID}}/*
   - arn:aws:s3:::emrserverless-workshop-{{AccountID}}
+  - arn:aws:s3:::emrserverless-interactive-{{AccountID}}-{{REGION}}/*
+  - arn:aws:s3:::emrserverless-interactive-{{AccountID}}-{{REGION}}
 - Effect: Allow
   Action:
   - glue:GetDatabase
@@ -37,3 +39,5 @@
   - arn:aws:s3:::*.elasticmapreduce/*
   - arn:aws:s3:::aws-data-analytics-workshops
   - arn:aws:s3:::aws-data-analytics-workshops/*
+  - arn:aws:s3:::athena-examples-us-east-1
+  - arn:aws:s3:::athena-examples-us-east-1/*
