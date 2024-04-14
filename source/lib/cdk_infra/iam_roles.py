@@ -193,34 +193,34 @@ class IamConst(Construct):
         )
         self._emr_studio_role.apply_removal_policy(RemovalPolicy.DESTROY)
     
-        # EMR studio admin user
-        self._emrstudio_admin_user = iam.User(self,'emrstudioAdminUser',
-            user_name = 'emrs-interactive-app-admin-user',
-            password = SecretValue.unsafe_plain_text('myP@ssW0rd')
-        )
-        _emrstudio_admin_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-studio-admin-user-policy.yaml', 
-            fields= {
-                "{{EMR_STUDIO_SVC_ROLE_ARN}}": self._emr_studio_role.role_arn,
-                "{{EMRS_RUNTIME_ROLE_ARN}}": self._emrs_job_role.role_arn
-            })
-        for statmnt in _emrstudio_admin_iam:
-            self._emrstudio_admin_user.add_to_policy(iam.PolicyStatement.from_json(statmnt)
-        )
-        self._emrstudio_admin_user.apply_removal_policy(RemovalPolicy.DESTROY)
+        # # EMR studio admin user
+        # self._emrstudio_admin_user = iam.User(self,'emrstudioAdminUser',
+        #     user_name = 'emrs-interactive-app-admin-user',
+        #     password = SecretValue.unsafe_plain_text('myP@ssW0rd')
+        # )
+        # _emrstudio_admin_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-studio-admin-user-policy.yaml', 
+        #     fields= {
+        #         "{{EMR_STUDIO_SVC_ROLE_ARN}}": self._emr_studio_role.role_arn,
+        #         "{{EMRS_RUNTIME_ROLE_ARN}}": self._emrs_job_role.role_arn
+        #     })
+        # for statmnt in _emrstudio_admin_iam:
+        #     self._emrstudio_admin_user.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        # )
+        # self._emrstudio_admin_user.apply_removal_policy(RemovalPolicy.DESTROY)
 
-        # EMR Studio dev user
-        self._emrstudio_dev_user = iam.User(self,'emrstudioDevUser',
-            user_name = 'emrs-interactive-app-dev-user',
-            password = SecretValue.unsafe_plain_text('myP@ssW0rd')
-        )
-        _emrstudio_dev_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-studio-dev-user-policy.yaml', 
-            fields= {
-                "{{AccountID}}": Aws.ACCOUNT_ID,
-                "{{REGION}}": Aws.REGION,
-                "{{EMR_STUDIO_SVC_ROLE_ARN}}": self._emr_studio_role.role_arn,
-                "{{EMRS_RUNTIME_ROLE_ARN}}": self._emrs_job_role.role_arn
-            })
-        for statmnt in _emrstudio_dev_iam:
-            self._emrstudio_dev_user.add_to_policy(iam.PolicyStatement.from_json(statmnt)
-        )
-        self._emrstudio_dev_user.apply_removal_policy(RemovalPolicy.DESTROY)
+        # # EMR Studio dev user
+        # self._emrstudio_dev_user = iam.User(self,'emrstudioDevUser',
+        #     user_name = 'emrs-interactive-app-dev-user',
+        #     password = SecretValue.unsafe_plain_text('myP@ssW0rd')
+        # )
+        # _emrstudio_dev_iam = load_yaml_replace_var_local(source_dir+'/app_resources/emr-studio-dev-user-policy.yaml', 
+        #     fields= {
+        #         "{{AccountID}}": Aws.ACCOUNT_ID,
+        #         "{{REGION}}": Aws.REGION,
+        #         "{{EMR_STUDIO_SVC_ROLE_ARN}}": self._emr_studio_role.role_arn,
+        #         "{{EMRS_RUNTIME_ROLE_ARN}}": self._emrs_job_role.role_arn
+        #     })
+        # for statmnt in _emrstudio_dev_iam:
+        #     self._emrstudio_dev_user.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        # )
+        # self._emrstudio_dev_user.apply_removal_policy(RemovalPolicy.DESTROY)

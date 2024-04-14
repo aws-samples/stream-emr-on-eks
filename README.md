@@ -45,12 +45,12 @@ The infrastructure deployment includes the following:
     - registered the newly created DataLake S3 bucket as the data lake location
     - created a Data location for lf-data-access-engineer role
     - created a permission for lf-data-access-analyst role to describe the 'default' DB
-- EMR Studio roles and Users
+<!-- - EMR Studio roles and Users
     - emr-studio-service-role: setup the access for the S3 Bucket `emrserverless-interactive-{Aws.ACCOUNT_ID}-{Aws.REGION}`
     - Studio Admin User: administrator with access of creating EMR studio & Workspace
-    - Studio Dev User: - developer with permissions to launch Workspace and create notebooks in it
-- An EMR Serverless role
-    - EMRServerlessRuntimeRole: EMR Serverless job runtime role for Stremaing & interactive labs
+    - Studio Dev User: - developer with permissions to launch Workspace and create notebooks in it -->
+- An EMR Serverless IAM role
+    - EMRServerlessRuntimeRole: EMR Serverless job runtime role for both streaming & interactive labs
  
 Follow the `Customization` section to deploy via CFN, or comment out the `lf_stack` in `app.py` then "CDK deploy".
 
