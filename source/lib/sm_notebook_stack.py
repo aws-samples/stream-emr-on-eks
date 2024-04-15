@@ -27,7 +27,7 @@ class NotebookStack(NestedStack):
         echo "export REGION=$region" | tee -a ~/.bash_profile
         echo "export ACCOUNTID=$account_id" | tee -a ~/.bash_profile
         echo "export DATALAKE_BUCKET=$datalake_bucket" | tee -a ~/.bash_profile
-        echo "export CODE_BUCKET={code_bucket}" | tee -a ~/.bash_profile
+        echo "export CODE_BUCKET="{code_bucket} | tee -a ~/.bash_profile
         echo "export ENGINEER_ROLE=$engineer_role_arn" | tee -a ~/.bash_profile
         echo "export ANALYST_ROLE=$analyst_role_arn" | tee -a ~/.bash_profile
         
