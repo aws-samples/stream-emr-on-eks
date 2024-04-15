@@ -11,28 +11,33 @@
   - ecr:GetLifecyclePolicy
   - ecr:GetLifecyclePolicyPreview
   - ecr:ListTagsForResource
-  - ecr:DescribeImageScanFinding  
-  - kinesis:ListStreams
-	- kinesis:SubscribeToShard
-	- kinesis:DescribeStreamSummary
-	- kinesis:ListShards
-	- kinesis:DescribeStreamConsumer
-	- kinesis:GetResourcePolicy
-	- kinesis:GetShardIterator
-	- kinesis:GetRecords
-	- kinesis:DescribeStream
-	- kinesis:DescribeLimits
-	- kinesis:ListStreamConsumers
-	- kinesis:ListTagsForStream
-	- logs:PutLogEvents
-	- logs:CreateLogGroup
-	- logs:PutRetentionPolicy
-	- logs:CreateLogStream
-	- logs:DescribeLogGroups
-	- logs:DescribeLogStreams
-	- glue:*
-	- s3:GetObject
-	- s3:ListBucket
-	- s3:PutObject"
-  Resource:
-    - '*'
+  - ecr:DescribeImageScanFinding
+  - glue:GetTable
+  - glue:GetTables
+  - glue:SearchTables
+  - glue:GetDatabase
+  - glue:GetDatabases
+  - glue:GetPartitions
+  - glue:GetPartition
+  - glue:CreateDatabase
+  - kinesis:DescribeStreamSummary
+  - kinesis:ListShards
+  - kinesis:DescribeStreamConsumer
+  - kinesis:GetResourcePolicy
+  - kinesis:GetShardIterator
+  - kinesis:GetRecords
+  - kinesis:DescribeStream
+  - kinesis:DescribeLimits
+  - kinesis:ListStreamConsumers
+  - kinesis:ListTagsForStream
+  - logs:PutLogEvents
+  - logs:CreateLogGroup
+  - logs:PutRetentionPolicy
+  - logs:CreateLogStream
+  - logs:DescribeLogGroups
+  - logs:DescribeLogStreams
+  - s3:GetObject
+  - s3:ListBucket
+  - s3:PutObject 
+  Resource: 
+    - "*"

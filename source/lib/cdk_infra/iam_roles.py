@@ -205,7 +205,6 @@ class IamConst(Construct):
         self._emr_flink_role.apply_removal_policy(RemovalPolicy.DESTROY)
 
 
-
         # # EMR studio admin user
         # self._emrstudio_admin_user = iam.User(self,'emrstudioAdminUser',
         #     user_name = 'emrs-interactive-app-admin-user',
