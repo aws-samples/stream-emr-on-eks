@@ -12,6 +12,7 @@
   - secretsmanager:*
   - ec2:Describe*
   - ec2:Get*
+  - ec2:ModifyVolume
   - iam:Get*
   - iam:List*
   - iam:Tag*
@@ -80,6 +81,8 @@
 - Effect: Allow
   Action:
   - ecr-public:GetAuthorizationToken
+  - ecr:CreateRepository
+  - ecr:GetAuthorizationToken
   - sts:GetServiceBearerToken
   - ecr-public:BatchCheckLayerAvailability
   - ecr-public:GetRepositoryPolicy
