@@ -192,7 +192,20 @@ class IamConst(Construct):
             self._emr_studio_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
         )
         self._emr_studio_role.apply_removal_policy(RemovalPolicy.DESTROY)
-    
+
+        # EMR Flink Role
+        self._emr_flink_role = iam.Role(self,'emrsFlinkRole',
+            role_name="emr-flink-role",
+            assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com')
+        )
+        _emr_flink_iam = load_yaml_local(source_dir+'/app_resources/emr-eks-flink-role.yaml') 
+        for statmnt in _emr_flink_iam:
+            self._emr_flink_role.add_to_policy(iam.PolicyStatement.from_json(statmnt)
+        )
+        self._emr_flink_role.apply_removal_policy(RemovalPolicy.DESTROY)
+
+
+
         # # EMR studio admin user
         # self._emrstudio_admin_user = iam.User(self,'emrstudioAdminUser',
         #     user_name = 'emrs-interactive-app-admin-user',
