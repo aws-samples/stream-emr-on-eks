@@ -95,7 +95,39 @@
   Resource: 
     - "*"
 - Effect: Allow
+  Action:
+  - ecr:BatchGetImage
+  - ecr:BatchCheckLayerAvailability
+  - ecr:CompleteLayerUpload
+  - ecr:DescribeImages
+  - ecr:DescribeRepositories
+  - ecr:GetDownloadUrlForLayer
+  - ecr:InitiateLayerUpload
+  - ecr:ListImages
+  - ecr:PutImage
+  - ecr:UploadLayerPart
+  - ecr:InitiateLayerUpload
+  - ecr:UploadLayerPart
+  - ecr:CompleteLayerUpload
+  Resource:
+  - arn:aws:ecr:{{REGION}}:{{AccountID}}:repository/*"       
+- Effect: Allow
   Action:    
   - logs:*
   Resource:
   - arn:aws:logs:*:*:*
+- Effect: Allow
+  Action: 
+  - kinesis:DescribeStreamSummary
+  - kinesis:ListShards
+  - kinesis:DescribeStreamConsumer
+  - kinesis:GetResourcePolicy
+  - kinesis:GetShardIterator
+  - kinesis:GetRecords
+  - kinesis:DescribeStream
+  - kinesis:DescribeLimits
+  - kinesis:ListStreamConsumers
+  - kinesis:ListTagsForStream
+  - kinesis:CreateStream
+  Resource:
+  - "*"
