@@ -29,7 +29,7 @@ echo "export EMRSRole=${EMRSRole}" | tee -a ~/.bash_profile
 
 # 2. install k8s command tools
 echo "Installing kubectl tool..."
-curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.24.10/2023-01-30/bin/linux/amd64/kubectl
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.12/2024-01-04/bin/darwin/amd64/kubectl
 chmod +x kubectl
 mkdir -p $HOME/bin && mv kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
 

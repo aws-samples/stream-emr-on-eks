@@ -129,5 +129,6 @@
   - kinesis:ListStreamConsumers
   - kinesis:ListTagsForStream
   - kinesis:CreateStream
+  - acm:ListCertificates
   Resource:
   - "*"
