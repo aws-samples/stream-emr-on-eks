@@ -196,7 +196,10 @@ class IamConst(Construct):
         # EMR Flink Role
         self._emr_flink_role = iam.Role(self,'emrsFlinkRole',
             role_name="emr-flink-role",
-            assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com')
+            assumed_by=iam.CompositePrincipal(
+                    iam.ServicePrincipal('elasticmapreduce.amazonaws.com'),
+                    iam.ServicePrincipal("'glue.amazonaws.com'")
+            )
         )
         _emr_flink_iam = load_yaml_local(source_dir+'/app_resources/emr-eks-flink-role.yaml') 
         for statmnt in _emr_flink_iam:
