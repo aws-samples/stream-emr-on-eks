@@ -20,6 +20,8 @@
   - glue:GetPartitions
   - glue:GetPartition
   - glue:CreateDatabase
+  - glue:CreateTable
+  - glue:BatchGetPartition
   - kinesis:DescribeStreamSummary
   - kinesis:ListShards
   - kinesis:DescribeStreamConsumer
