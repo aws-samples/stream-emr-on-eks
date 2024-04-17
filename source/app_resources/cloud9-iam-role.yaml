@@ -110,7 +110,7 @@
   - ecr:UploadLayerPart
   - ecr:CompleteLayerUpload
   Resource:
-  - arn:aws:ecr:{{REGION}}:{{AccountID}}:repository/*"       
+  - arn:aws:ecr:{{REGION}}:{{AccountID}}:repository/*
 - Effect: Allow
   Action:    
   - logs:*
