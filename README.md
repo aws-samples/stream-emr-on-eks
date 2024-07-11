@@ -5,7 +5,7 @@ It includes sample data, Kafka producer simulator, and a consumer example that c
 
 The infrastructure deployment includes the following:
 - A new S3 bucket to store sample data and stream job code
-- An EKS cluster v1.24 in a new VPC across 2 AZs
+- An EKS cluster v1.28 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value `serverless`
 - An EMR virtual cluster in the same VPC
