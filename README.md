@@ -97,7 +97,7 @@ The following `post-deployment.sh` is executable in Linux, not for Mac OSX. Modi
 VPC prefix: 'emr-stream-demo'
 Instance Type: 't3.small'
 ```
-2. [Attach the IAM role that contains `Cloud9Admin` to your IDE](https://catalog.us-east-1.prod.workshops.aws/workshops/d90c2f2d-a84b-4e80-b4f9-f5cee0614426/en-US/30-emr-serverless/31-set-up-env#setup-cloud9-ide). 
+2. [Attach the IAM role that contains `Cloud9Admin` to your IDE](https://catalog.us-east-1.prod.workshops.aws/workshops/d90c2f2d-a84b-4e80-b4f9-f5cee0614426/en-US/30-emr-serverless/31-streaming-application/32-setup-environment#setup-cloud9-ide). 
 
 3. Turn off AWS managed temporary credentials in Cloud9:
 ```bash
@@ -112,13 +112,31 @@ rm -vf ${HOME}/.aws/credentials
 ```bash
 curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/main/deployment/app_code/post-deployment.sh | bash
 ```
-5. Wait for 5 mins, then check the [MSK cluster](https://console.aws.amazon.com/msk/) status. Make sure it is `active` before sending data to the cluster.
+Optionally, if you are not using the default CloudFormation name "emr-stream-demo", pass in your own CFN stack name as a parameter:
+```bash
+curl https://raw.githubusercontent.com/aws-samples/stream-emr-on-eks/main/deployment/app_code/post-deployment.sh | bash -s -- MY_CFN_STACK_NAME
+```
+<!-- 5. Wait for 5 mins, then check the [MSK cluster](https://console.aws.amazon.com/msk/) status. Make sure it is `active` before sending data to the cluster. -->
+5. Configure MSK cluster
+```bash
+# retrieve required environment variables
+source ~/.bash_profile
+echo "s3 name: $S3BUCKET" && echo "MSK broker: $MSK_SERVER"
+# create 2 Kafka topics
+kafka_2.12-2.8.1/bin/kafka-topics.sh --bootstrap-server $MSK_SERVER --create --topic taxirides 
+kafka_2.12-2.8.1/bin/kafka-topics.sh --bootstrap-server $MSK_SERVER --create --topic emrec2-output
+kafka_2.12-2.8.1/bin/kafka-topics.sh --bootstrap-server $MSK_SERVER --create --topic emreks_output
+kafka_2.12-2.8.1/bin/kafka-topics.sh --bootstrap-server $MSK_SERVER --create --topic emreksfg_output
+
+# list Kafka topic
+kafka_2.12-2.8.1/bin/kafka-topics.sh --bootstrap-server $MSK_SERVER --list
+``` 
 6. Launching a new termnial window in Cloud9, send the sample data to MSK:
 ```bash
 wget https://github.com/xuite627/workshop_flink1015-1/raw/master/dataset/nycTaxiRides.gz
-zcat nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.8.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.2"  > /dev/null
+zcat nycTaxiRides.gz | split -l 10000 --filter="kafka_2.12-2.8.1/bin/kafka-console-producer.sh --broker-list ${MSK_SERVER} --topic taxirides ; sleep 0.5"  > /dev/null
 ```
-6. Launching the 3rd termnial window and monitor the source MSK topic:
+6. Launching the 2nd termnial window and monitor the source MSK topic:
 ```bash
 kafka_2.12-2.8.1/bin/kafka-console-consumer.sh \
 --bootstrap-server ${MSK_SERVER} \
@@ -136,12 +154,12 @@ aws emr-containers start-job-run \
 --virtual-cluster-id $VIRTUAL_CLUSTER_ID \
 --name msk_consumer \
 --execution-role-arn $EMR_ROLE_ARN \
---release-label emr-5.33.0-latest \
+--release-label emr-6.10.0-latest \
 --job-driver '{
     "sparkSubmitJobDriver":{
         "entryPoint": "s3://'$S3BUCKET'/app_code/job/msk_consumer.py",
         "entryPointArguments":["'$MSK_SERVER'","s3://'$S3BUCKET'/stream/checkpoint/emreks","emreks_output"],
-        "sparkSubmitParameters": "--conf spark.jars.packages=org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 --conf spark.cleaner.referenceTracking.cleanCheckpoints=true --conf spark.executor.instances=2 --conf spark.executor.memory=2G --conf spark.driver.memory=2G --conf spark.executor.cores=2"}}' \
+        "sparkSubmitParameters": "--conf spark.jars.packages=org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1 --conf spark.cleaner.referenceTracking.cleanCheckpoints=true --conf spark.executor.instances=2 --conf spark.executor.memory=2G --conf spark.driver.memory=2G --conf spark.executor.cores=2"}}' \
 --configuration-overrides '{
     "applicationConfiguration": [
       {
