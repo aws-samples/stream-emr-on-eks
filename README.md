@@ -20,7 +20,7 @@ The infrastructure deployment includes the following:
 - A MWAA Environment
     - install `apache-airflow-providers-amazon` pip package for EMR Serverless operator
     - `*EMR-Serverless-MWAARole*` IAM role for MWAA environment
-- An EKS cluster v1.26 in a new VPC across 2 AZs
+- An EKS cluster v1.30 in a new VPC across 2 AZs
     - The Cluster has 2 default managed node groups: the OnDemand nodegroup scales from 1 to 5, SPOT instance nodegroup can scale from 1 to 30. 
     - It also has a Fargate profile labelled with the value serverless
 - An EMR on EKS virtual cluster in the same VPC
