@@ -22,9 +22,9 @@ setuptools.setup(
     packages=setuptools.find_packages(where="source"),
 
     install_requires=[
-        "aws-cdk-lib==2.105.0",
-        "aws-cdk.aws-msk-alpha==2.105.0a0",
-        "aws-cdk.lambda-layer-kubectl-v26",
+        "aws-cdk-lib==2.200.0",
+        "aws-cdk.aws-msk-alpha==2.200.0a0",
+        "aws-cdk.lambda-layer-kubectl-v30",
         "constructs>=10.0.0,<11.0.0",
         "pyyaml==6.0.1"
     ],
